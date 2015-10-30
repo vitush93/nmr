@@ -23,12 +23,6 @@ public class MainController implements Initializable {
     @FXML
     Button startButton;
 
-    @FXML
-    NumberAxis xAxis;
-
-    @FXML
-    NumberAxis yAxis;
-
     boolean started = false;
 
     Pulse source;
