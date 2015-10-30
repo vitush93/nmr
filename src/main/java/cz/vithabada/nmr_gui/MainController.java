@@ -1,10 +1,9 @@
 package cz.vithabada.nmr_gui;
 
+import cz.vithabada.nmr_gui.pulse.Pulse;
 import cz.vithabada.nmr_gui.pulse.RandomDataSource;
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentNavigableMap;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,58 +11,77 @@ import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import libs.Complex;
 import libs.Invokable;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
 public class MainController implements Initializable {
 
     @FXML
-    private LineChart<String, Number> lineChart;
-    
-    @FXML
-    private NumberAxis xAxis;
-    
-    @FXML
-    private NumberAxis yAxis;
+    LineChart<String, Number> lineChart;
 
     @FXML
-    private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
+    Button startButton;
 
-        DB db;
-        db = DBMaker.fileDB(new File("database"))
-                .encryptionEnable("password")
-                .make();
+    @FXML
+    NumberAxis xAxis;
 
-        ConcurrentNavigableMap<Integer, String> map = db.treeMap("collectionName");
+    @FXML
+    NumberAxis yAxis;
 
-        map.put(1, "one");
-        map.put(2, "two");
+    boolean started = false;
 
-        db.commit();
-
-        ConcurrentNavigableMap<Integer, String> map2 = db.treeMap("collectionName");
-
-        for (Integer key : map2.keySet()) {
-            System.out.println(map2.get(key));
-        }
-
-        db.close();
-    }
+    Pulse source;
 
     @FXML
     private void handleStart(ActionEvent event) {
-        lineChart.setVisible(true);
+        if (started) {
+            startButton.setText("Start");
+            source.stop();
 
-        final RandomDataSource source = new RandomDataSource(10);
-        source.onFetch.add(new Invokable<Complex[]>() {
+            started = false;
+
+            return;
+        }
+
+        started = true;
+        startButton.setText("Stop");
+
+        Task task = new Task<Void>() {
+
+            @Override
+            protected Void call() throws Exception {
+                source.start();
+
+                return null;
+            }
+        };
+
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        Invokable<Complex[]> event = createChartUpdateEvent();
+
+        source = new RandomDataSource(10);
+        source.onFetch.add(event);
+    }
+
+    /**
+     * Event that updates chart with a new data.
+     *
+     * @return Invokable
+     */
+    private Invokable<Complex[]> createChartUpdateEvent() {
+        return new Invokable<Complex[]>() {
 
             @Override
             public void invoke(Object sender, Complex[] value) {
                 lineChart.getData().clear();
-                
+
                 final XYChart.Series real = new XYChart.Series();
                 real.setName("Real");
 
@@ -81,26 +99,6 @@ public class MainController implements Initializable {
                 lineChart.getData().add(real);
                 lineChart.getData().add(imag);
             }
-        });
-        
-        Task task = new Task<Void>() {
-
-            @Override
-            protected Void call() throws Exception {
-                source.start();
-                
-                return null;
-            }
-            
         };
-        
-        Thread t = new Thread(task);
-        t.setDaemon(true);
-        t.start();
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        
     }
 }

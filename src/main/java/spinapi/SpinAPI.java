@@ -1,17 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package spinapi;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 
-/**
- *
- * @author vitush
- */
 public interface SpinAPI extends Library {
 
     static final int FREQ_REGS = 1;
@@ -79,16 +70,16 @@ public interface SpinAPI extends Library {
             int inst,
             int inst_data,
             double length);
-    
+
     int pb_reset();
-    
+
     int pb_stop();
-    
+
     int pb_start();
-    
+
     int pb_read_status();
-    
+
     void pb_sleep_ms(int miliseconds);
-    
+
     int pb_get_data(int num_points, int[] real_data, int[] imag_data);
 }

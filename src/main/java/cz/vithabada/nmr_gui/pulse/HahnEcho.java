@@ -1,21 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.vithabada.nmr_gui.pulse;
 
 import libs.Complex;
 import spinapi.SpinAPI;
 
-/**
- *
- * @author vitush
- */
 public class HahnEcho extends Pulse {
 
     private final SpinAPI api;
-    
+
     private Complex[] data;
 
     public HahnEcho() {
@@ -60,7 +51,7 @@ public class HahnEcho extends Pulse {
         double ringdown_time = TAU - 0.5 * ECHO_TIME;
 
         int num_points = (int) Math.floor(((scan_time) / 1e6) * actualSpectralWidth);
-        
+
         this.data = new Complex[num_points];
 
         api.pb_set_num_points(num_points);
@@ -156,5 +147,12 @@ public class HahnEcho extends Pulse {
         for (int i = 0; i < real.length; i++) {
             System.out.println("(" + real[i] + "," + imag[i] + ")");
         }
+    }
+
+    @Override
+    public void stop() {
+        api.pb_stop();
+
+        // TODO stop
     }
 }

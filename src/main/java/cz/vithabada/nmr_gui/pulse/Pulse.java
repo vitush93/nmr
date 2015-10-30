@@ -1,14 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.vithabada.nmr_gui.pulse;
 
-/**
- *
- * @author vitush
- */
+import java.util.List;
+import libs.Complex;
+import libs.Invokable;
+
 public abstract class Pulse {
+
+    public List<Invokable<Complex[]>> onFetch;
+
     public abstract void start();
+
+    public abstract void stop();
+
 }

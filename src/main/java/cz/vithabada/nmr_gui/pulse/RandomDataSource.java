@@ -1,7 +1,6 @@
 package cz.vithabada.nmr_gui.pulse;
 
 import java.util.ArrayList;
-import java.util.List;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,9 +12,9 @@ import libs.Invokable;
 
 public class RandomDataSource extends Pulse {
 
-    public List<Invokable<Complex[]>> onFetch;
+    final int length;
 
-    private final int length;
+    Timeline clock;
 
     public RandomDataSource(int len) {
         this.onFetch = new ArrayList<>();
@@ -25,7 +24,7 @@ public class RandomDataSource extends Pulse {
     @Override
     public void start() {
 
-        Timeline clock = new Timeline(new KeyFrame(Duration.seconds(0), new EventHandler<ActionEvent>() {
+        clock = new Timeline(new KeyFrame(Duration.seconds(0), new EventHandler<ActionEvent>() {
 
             private Complex[] generate() {
                 Complex[] arr = new Complex[length];
@@ -42,10 +41,15 @@ public class RandomDataSource extends Pulse {
                     inv.invoke(RandomDataSource.this, generate());
                 }
             }
-            
+
         }), new KeyFrame(Duration.seconds(1)));
-        
+
         clock.setCycleCount(Animation.INDEFINITE);
         clock.play();
+    }
+
+    @Override
+    public void stop() {
+        clock.stop();
     }
 }
