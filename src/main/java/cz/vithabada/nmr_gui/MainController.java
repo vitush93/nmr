@@ -1,14 +1,18 @@
 package cz.vithabada.nmr_gui;
 
+import cz.vithabada.nmr_gui.pulse.RandomDataSource;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentNavigableMap;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import libs.Complex;
+import libs.Invokable;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
@@ -44,28 +48,54 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleStart(ActionEvent event) {
-        final XYChart.Series real = new XYChart.Series();
-        real.setName("Real");
-
-        real.getData().add(new XYChart.Data("1", 23));
-        real.getData().add(new XYChart.Data("2", 14));
-        real.getData().add(new XYChart.Data("3", 15));
-
-        final XYChart.Series imag = new XYChart.Series();
-        imag.setName("Imaginary");
-
-        imag.getData().add(new XYChart.Data("1", 12));
-        imag.getData().add(new XYChart.Data("2", 8));
-        imag.getData().add(new XYChart.Data("3", 2));
-
-        lineChart.getData().add(real);
-        lineChart.getData().add(imag);
-        
         lineChart.setVisible(true);
+
+        final RandomDataSource source = new RandomDataSource(10);
+        source.onFetch.add(new Invokable<Complex[]>() {
+
+            @Override
+            public void invoke(Object sender, Complex[] value) {
+                lineChart.getData().clear();
+                
+                final XYChart.Series real = new XYChart.Series();
+                real.setName("Real");
+
+                final XYChart.Series imag = new XYChart.Series();
+                imag.setName("Imaginary");
+
+                int count = 0;
+                for (Complex c : value) {
+                    String index = count + "";
+
+                    real.getData().add(new XYChart.Data(index, c.getReal()));
+                    imag.getData().add(new XYChart.Data(index, c.getImag()));
+
+                    count++;
+                }
+
+                lineChart.getData().add(real);
+                lineChart.getData().add(imag);
+            }
+        });
+        
+        Task task = new Task<Void>() {
+
+            @Override
+            protected Void call() throws Exception {
+                source.start();
+                
+                return null;
+            }
+            
+        };
+        
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+
     }
 }

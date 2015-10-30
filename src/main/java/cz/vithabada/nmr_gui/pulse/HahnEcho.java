@@ -5,17 +5,25 @@
  */
 package cz.vithabada.nmr_gui.pulse;
 
+import libs.Complex;
 import spinapi.SpinAPI;
 
 /**
  *
  * @author vitush
  */
-public class HahnEcho {
+public class HahnEcho extends Pulse {
 
-    private static SpinAPI api;
+    private final SpinAPI api;
+    
+    private Complex[] data;
 
-    public static void start() {
+    public HahnEcho() {
+        this.api = SpinAPI.INSTANCE;
+    }
+
+    @Override
+    public void start() {
         double ADC_FREQUENCY = 75.0;
         double SPECTROMETER_FREQUENCY = 2;
         int SPECTRAL_WIDTH = 642;
@@ -30,9 +38,7 @@ public class HahnEcho {
         int BLANKING_BIT = 2;
         int BLANKING_DELAY = 3;
         float AMPLITUDE = 0.3f;
-        double REPETITION_DELAY=1;
-
-        api = SpinAPI.INSTANCE;
+        double REPETITION_DELAY = 1;
 
         System.out.println("SpinAPI version: " + api.pb_get_version());
         if (api.pb_count_boards() <= 0) {
@@ -54,6 +60,8 @@ public class HahnEcho {
         double ringdown_time = TAU - 0.5 * ECHO_TIME;
 
         int num_points = (int) Math.floor(((scan_time) / 1e6) * actualSpectralWidth);
+        
+        this.data = new Complex[num_points];
 
         api.pb_set_num_points(num_points);
         api.pb_set_scan_segments(1);
@@ -111,47 +119,42 @@ public class HahnEcho {
         api.pb_inst_radio_shape(0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, 0x00, SpinAPI.CONTINUE, 0, ringdown_time * 1000.0);
 
         api.pb_inst_radio_shape(0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.DO_TRIGGER, 0, 0, 0x00, SpinAPI.CONTINUE, 0, ECHO_TIME * 1000.0);
-        
+
         // At about this time the num_points data points have been scanned, 
         // so the scanning stops.  
+        // Allow sample to relax before acquiring another scan
+        api.pb_inst_radio_shape(0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, 0x00, SpinAPI.CONTINUE, 0, REPETITION_DELAY * 1000.0 * 1000000.0);
 
-  	// Allow sample to relax before acquiring another scan
-        api.pb_inst_radio_shape (0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER,0,0, 0x00, SpinAPI.CONTINUE, 0, REPETITION_DELAY * 1000.0 * 1000000.0);
-        
         // Loop back and do scan again. This will occur num_scans times
-        api.pb_inst_radio_shape (0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.PHASE_RESET, SpinAPI.NO_TRIGGER,0,0, 0x00, SpinAPI.END_LOOP, scan_loop_label, 1.0 * 1000.0);
-        
+        api.pb_inst_radio_shape(0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, 0x00, SpinAPI.END_LOOP, scan_loop_label, 1.0 * 1000.0);
+
         // Then stop the pulse program
-        api.pb_inst_radio_shape (0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER,0,0, 0x00, SpinAPI.STOP, 0, 1.0 * 1000.0);
-        
-        api.pb_stop_programming ();
-        
+        api.pb_inst_radio_shape(0, SpinAPI.PHASE090, SpinAPI.PHASE000, 0, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, 0x00, SpinAPI.STOP, 0, 1.0 * 1000.0);
+
+        api.pb_stop_programming();
+
         api.pb_reset();
         api.pb_start();
-        
-        
+
         int scan_count = 0; // Scan count is not deterministic. Scans may be skipped or repeated
 
-      while (api.pb_read_status () != 0x03)    //Wait for the board to complete execution.
-      {      
-          while( (api.pb_scan_count(0) <= scan_count)&& (api.pb_read_status () != 0x03) )
-          {
-              api.pb_sleep_ms(100);
-          }
+        while (api.pb_read_status() != 0x03) //Wait for the board to complete execution.
+        {
+            while ((api.pb_scan_count(0) <= scan_count) && (api.pb_read_status() != 0x03)) {
+                api.pb_sleep_ms(100);
+            }
 
-          if (api.pb_read_status () != 0x03) 
-          {
-              System.out.println("Current Scan: " + api.pb_scan_count(0));
-          }
-          
-          scan_count++;
-      }
-      
-      
-      api.pb_get_data (num_points, real, imag);
-      
-      for(int i = 0; i < real.length; i++) {
-          System.out.println("(" + real[i] + "," + imag[i] + ")");
-      }
+            if (api.pb_read_status() != 0x03) {
+                System.out.println("Current Scan: " + api.pb_scan_count(0));
+            }
+
+            scan_count++;
+        }
+
+        api.pb_get_data(num_points, real, imag);
+
+        for (int i = 0; i < real.length; i++) {
+            System.out.println("(" + real[i] + "," + imag[i] + ")");
+        }
     }
 }

@@ -1,0 +1,54 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package libs;
+
+/**
+ *
+ * @author vitush
+ */
+public class Complex {
+
+    int real;
+    int imag;
+
+    public Complex(int real, int imag) {
+        this.real = real;
+        this.imag = imag;
+    }
+
+    public static Complex[] createArray(int[] real, int[] imag) throws Exception {
+        if (real.length != imag.length) {
+            throw new Exception("Real and imaginary arrays must be the same length.");
+        }
+
+        Complex[] complex = new Complex[real.length];
+        for (int i = 0; i < real.length; i++) {
+            Complex c = new Complex(real[i], imag[i]);
+
+            complex[i] = c;
+        }
+
+        return complex;
+    }
+
+    public int getReal() {
+        return real;
+    }
+
+    public void setReal(int real) {
+        this.real = real;
+    }
+
+    public int getImag() {
+        return imag;
+    }
+
+    public void setImag(int imag) {
+        this.imag = imag;
+    }
+    
+    
+}
