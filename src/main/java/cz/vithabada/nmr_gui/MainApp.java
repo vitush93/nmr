@@ -12,14 +12,14 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         stage.setMinWidth(900);
-        stage.setMinHeight(600);
+        stage.setMinHeight(500);
         
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
 
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("NMR GUI");
         stage.setScene(scene);
         
         stage.show();

@@ -9,7 +9,7 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" fx:controller="cz.vithabada.nmr_gui.FXMLController">
+<VBox prefHeight="500.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.MainController">
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>
@@ -30,12 +30,12 @@
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
-                        <LineChart fx:id="lineChart" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <LineChart fx:id="lineChart" visible="false" layoutX="70.0" animated="false"  layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <xAxis>
-                                <CategoryAxis side="BOTTOM" label="Frequency"  />
+                                <CategoryAxis label="Frequency" side="BOTTOM" />
                             </xAxis>
                             <yAxis>
-                                <NumberAxis side="LEFT" label="Value" />
+                                <NumberAxis label="Value" side="LEFT" />
                             </yAxis>
                         </LineChart>
                     </children>
@@ -46,7 +46,15 @@
                             <tabs>
                                 <Tab text="Hahn Echo">
                                     <content>
-                                        <ScrollPane prefHeight="200.0" prefWidth="200.0" />
+                                        <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                                            <content>
+                                                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                                    <children>
+                                                        <Button layoutX="89.0" layoutY="125.0" mnemonicParsing="false" onAction="#handleStart" text="Start" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
+                                                    </children>
+                                                </AnchorPane>
+                                            </content>
+                                        </ScrollPane>
                                     </content>
                                 </Tab>
                                 <Tab text="CPMG">
