@@ -30,9 +30,9 @@
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
-                        <LineChart fx:id="lineChart" visible="false" layoutX="70.0" animated="false"  layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <LineChart createSymbols="false"  fx:id="lineChart" visible="false" layoutX="70.0" animated="false"  layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <xAxis>
-                                <CategoryAxis label="Frequency" side="BOTTOM" />
+                                <NumberAxis label="Frequency" side="BOTTOM" />
                             </xAxis>
                             <yAxis>
                                 <NumberAxis label="Value" side="LEFT" />

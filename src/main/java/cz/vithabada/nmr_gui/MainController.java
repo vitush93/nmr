@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import libs.Complex;
 import libs.Invokable;
@@ -20,6 +21,12 @@ public class MainController implements Initializable {
 
     @FXML
     private LineChart<String, Number> lineChart;
+    
+    @FXML
+    private NumberAxis xAxis;
+    
+    @FXML
+    private NumberAxis yAxis;
 
     @FXML
     private void handleButtonAction(ActionEvent event) {
@@ -65,10 +72,8 @@ public class MainController implements Initializable {
 
                 int count = 0;
                 for (Complex c : value) {
-                    String index = count + "";
-
-                    real.getData().add(new XYChart.Data(index, c.getReal()));
-                    imag.getData().add(new XYChart.Data(index, c.getImag()));
+                    real.getData().add(new XYChart.Data(count, c.getReal()));
+                    imag.getData().add(new XYChart.Data(count, c.getImag()));
 
                     count++;
                 }
@@ -96,6 +101,6 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        
     }
 }

@@ -1,3 +1,7 @@
 .button {
     -fx-font-weight: bold;
 }
+
+.chart-series-line {    
+    -fx-stroke-width: 2px;
+}
