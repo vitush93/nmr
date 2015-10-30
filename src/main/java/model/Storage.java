@@ -1,10 +1,30 @@
 package model;
 
 import java.io.File;
-import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.Map;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
+/**
+ * Storage wrapper for MapDB.
+ *
+ * <example>
+ * <code>
+ * Storage storage = new Storage("database", "password"); // login to database (existing or create a new one)
+ *
+ * Map<Integer, String> map = storage.map("something"); // retrieve map
+ * (existing or create a new one)
+ *
+ * map.put(1, "item 1"); map.put(2, "item 2");
+ *
+ * storage.flush(); // flush changes to the filesystem
+ *
+ * for(Integer key : map.keySet()) { System.out.println(map.get(key)); }
+ * </code>
+ * </example>
+ *
+ * @author vitush
+ */
 public class Storage {
 
     DB db;
@@ -12,27 +32,15 @@ public class Storage {
     public Storage(String filename, String password) {
         db = DBMaker.fileDB(new File(filename))
                 .encryptionEnable(password)
+                .closeOnJvmShutdown()
                 .make();
     }
 
-    @Deprecated
-    public void fetch() {
-
-        // TODO remove example method
-        ConcurrentNavigableMap<Integer, String> map = db.treeMap("collectionName");
-
-        map.put(1, "one");
-        map.put(2, "two");
-
-        db.commit();
-
-        ConcurrentNavigableMap<Integer, String> map2 = db.treeMap("collectionName");
-
-        for (Integer key : map2.keySet()) {
-            System.out.println(map2.get(key));
-        }
-
-        db.close();
+    public <K, V> Map<K, V> map(String name) {
+        return db.treeMap(name);
     }
 
+    public void flush() {
+        db.commit();
+    }
 }
