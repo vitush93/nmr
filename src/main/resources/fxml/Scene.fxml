@@ -11,16 +11,16 @@
 
 <VBox prefHeight="500.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.MainController">
     <children>
-        <MenuBar VBox.vgrow="NEVER">
+        <MenuBar VBox.vgrow="NEVER" fx:id="menuBar">
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Quit" />
+                        <MenuItem onAction="#handleQuit"  mnemonicParsing="false" text="Quit" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Devices">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Attenuator" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleOpenAttenuatorWindow"  text="Attenuator" />
                         <MenuItem mnemonicParsing="false" text="USB-PTS" />
                     </items>
                 </Menu>
