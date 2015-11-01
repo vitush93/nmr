@@ -5,9 +5,9 @@ import spinapi.SpinAPI;
 
 public class HahnEcho extends Pulse {
 
-    private final SpinAPI api;
+    final SpinAPI api;
 
-    private Complex[] data;
+    Complex[] data;
 
     public HahnEcho() {
         this.api = SpinAPI.INSTANCE;

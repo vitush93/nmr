@@ -17,17 +17,18 @@ import libs.Invokable;
 public class MainController implements Initializable {
 
     @FXML
-    LineChart<String, Number> lineChart;
+    LineChart<Number, Number> lineChart;
 
     @FXML
     Button startButton;
 
     boolean started = false;
-
     Pulse source;
+    final XYChart.Series<Number, Number> real = new XYChart.Series();
+    final XYChart.Series<Number, Number> imag = new XYChart.Series();
 
     @FXML
-    private void handleStart(ActionEvent event) {
+    void handleStart(ActionEvent event) {
         if (started) {
             startButton.setText("Start");
             source.stop();
@@ -59,8 +60,11 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         Invokable<Complex[]> event = createChartUpdateEvent();
 
-        source = new RandomDataSource(10);
+        source = new RandomDataSource(128);
         source.onFetch.add(event);
+
+        real.setName("Real");
+        imag.setName("Imaginary");
     }
 
     /**
@@ -68,18 +72,13 @@ public class MainController implements Initializable {
      *
      * @return Invokable
      */
-    private Invokable<Complex[]> createChartUpdateEvent() {
+    Invokable<Complex[]> createChartUpdateEvent() {
         return new Invokable<Complex[]>() {
 
             @Override
             public void invoke(Object sender, Complex[] value) {
-                lineChart.getData().clear();
-
-                final XYChart.Series real = new XYChart.Series();
-                real.setName("Real");
-
-                final XYChart.Series imag = new XYChart.Series();
-                imag.setName("Imaginary");
+                real.getData().clear();
+                imag.getData().clear();
 
                 int count = 0;
                 for (Complex c : value) {
