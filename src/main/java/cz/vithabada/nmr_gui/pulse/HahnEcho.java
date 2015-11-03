@@ -3,7 +3,7 @@ package cz.vithabada.nmr_gui.pulse;
 import libs.Complex;
 import spinapi.SpinAPI;
 
-public class HahnEcho extends Pulse {
+public class HahnEcho implements Pulse<Complex[]> {
 
     final SpinAPI api;
 
@@ -151,8 +151,15 @@ public class HahnEcho extends Pulse {
 
     @Override
     public void stop() {
+        // TODO
+        
         api.pb_stop();
-
-        // TODO stop
+    }
+    
+    @Override
+    public Complex[] getData() {
+        // TODO
+        
+        return null;
     }
 }

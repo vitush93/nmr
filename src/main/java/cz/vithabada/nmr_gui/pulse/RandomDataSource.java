@@ -1,55 +1,54 @@
 package cz.vithabada.nmr_gui.pulse;
 
-import java.util.ArrayList;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.util.Duration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import libs.Complex;
-import libs.Invokable;
 
-public class RandomDataSource extends Pulse {
+public class RandomDataSource implements Pulse<Complex[]> {
 
     final int length;
 
-    Timeline clock;
+    boolean running;
+
+    volatile Complex[] data;
 
     public RandomDataSource(int len) {
-        this.onFetch = new ArrayList<>();
         this.length = len;
+        this.running = false;
     }
 
     @Override
     public void start() {
+        running = true;
 
-        clock = new Timeline(new KeyFrame(Duration.seconds(0), new EventHandler<ActionEvent>() {
+        while (true) {
+            if (!running) {
+                break;
+            }
 
-            private Complex[] generate() {
-                Complex[] arr = new Complex[length];
+            synchronized (this) {
+                data = new Complex[length];
+
                 for (int i = 0; i < length; i++) {
-                    arr[i] = new Complex((int) (Math.random() * 10), (int) (Math.random() * 10));
-                }
-
-                return arr;
-            }
-
-            @Override
-            public void handle(ActionEvent event) {
-                for (Invokable<Complex[]> inv : onFetch) {
-                    inv.invoke(RandomDataSource.this, generate());
+                    data[i] = new Complex((int) (Math.random() * 10), (int) (Math.random() * 10));
                 }
             }
 
-        }), new KeyFrame(Duration.seconds(1)));
-
-        clock.setCycleCount(Animation.INDEFINITE);
-        clock.play();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(RandomDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @Override
     public void stop() {
-        clock.stop();
+        running = false;
+    }
+
+    @Override
+    public synchronized Complex[] getData() {
+        return data;
     }
 }
