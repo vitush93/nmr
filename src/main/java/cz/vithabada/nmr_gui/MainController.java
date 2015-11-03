@@ -18,6 +18,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -34,6 +35,12 @@ public class MainController implements Initializable {
 
     @FXML
     MenuBar menuBar;
+    
+    @FXML
+    Label leftStatus;
+    
+    @FXML
+    Label rightStatus;
 
     boolean started = false;
     Pulse<Complex[]> source;
@@ -52,7 +59,6 @@ public class MainController implements Initializable {
             return;
         }
 
-        //source = new RandomDataSource(16);
         source = new HahnEcho();
         worker = createWorker();
 
@@ -112,8 +118,8 @@ public class MainController implements Initializable {
     void updateChart(Complex[] value) {
         lineChart.getData().clear();
 
-        final XYChart.Series<Number, Number> real = new XYChart.Series();
-        final XYChart.Series<Number, Number> imag = new XYChart.Series();
+        final XYChart.Series<Number, Number> real = new XYChart.Series<>();
+        final XYChart.Series<Number, Number> imag = new XYChart.Series<>();
 
         real.setName("Real");
         imag.setName("Imaginary");

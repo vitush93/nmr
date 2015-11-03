@@ -159,28 +159,7 @@ public class HahnEcho implements Pulse<Complex[]> {
             createData(real, imag);
 
             System.out.println("Current Scan: " + api.pb_scan_count(0));
-
-//            while ((api.pb_scan_count(0) <= scan_count) && (api.pb_read_status() != 0x03)) {
-//                if (!running) {
-//                    break;
-//                }
-//
-//                api.pb_sleep_ms(100);
-//
-//                api.pb_get_data(num_points, real, imag);
-//                createData(real, imag);
-//            }
-//
-//            if (api.pb_read_status() != 0x03) {
-//                System.out.println("Current Scan: " + api.pb_scan_count(0));
-//            }
-//
-//            scan_count++;
         }
-
-//        for (int i = 0; i < real.length; i++) {
-//            System.out.println("(" + real[i] + "," + imag[i] + ")");
-//        }
     }
 
     synchronized void createData(int[] real, int[] imag) {
