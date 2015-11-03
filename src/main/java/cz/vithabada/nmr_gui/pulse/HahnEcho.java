@@ -9,27 +9,30 @@ public class HahnEcho implements Pulse<Complex[]> {
 
     Complex[] data;
 
+    boolean running = false;
+
     public HahnEcho() {
         this.api = SpinAPI.INSTANCE;
     }
 
     @Override
     public void start() {
+        running = true;
+
         double ADC_FREQUENCY = 75.0;
         double SPECTROMETER_FREQUENCY = 2;
         int SPECTRAL_WIDTH = 642;
-        int NUMBER_OF_SCANS = 100;
-        int BYPASS_FIR = 1;
+        int NUMBER_OF_SCANS = 1000;
         double ECHO_TIME = 300;
         double TAU = 200;
         int P1_PHASE = 0;
         int P2_PHASE = 0;
-        int P1_TIME = 51;
-        int P2_TIME = 101;
+        int P1_TIME = 5;
+        int P2_TIME = 10;
         int BLANKING_BIT = 2;
-        int BLANKING_DELAY = 3;
+        double BLANKING_DELAY = 0.002;
         float AMPLITUDE = 0.3f;
-        double REPETITION_DELAY = 1;
+        double REPETITION_DELAY = 0.1;
 
         System.out.println("SpinAPI version: " + api.pb_get_version());
         if (api.pb_count_boards() <= 0) {
@@ -38,12 +41,25 @@ public class HahnEcho implements Pulse<Complex[]> {
             return;
         }
 
+        api.pb_init();
+
+        api.pb_set_debug(1);
+
         api.pb_set_defaults();
         api.pb_core_clock(ADC_FREQUENCY);
         api.pb_overflow(1, 0);
         api.pb_scan_count(1);
 
-        int dec_amount = api.pb_setup_filters(SPECTRAL_WIDTH / 1000.0, NUMBER_OF_SCANS, BYPASS_FIR);
+        System.out.println("desired SW: " + SPECTRAL_WIDTH / 1000.0);
+
+        int dec_amount = api.pb_setup_filters(SPECTRAL_WIDTH / 1000.0, NUMBER_OF_SCANS, api.BYPASS_FIR);
+        if (dec_amount < 0) {
+            System.out.println("ERROR: " + api.pb_get_error());
+
+            return;
+        }
+
+        System.out.println("Dec_amount: " + dec_amount);
         double actualSpectralWidth = (ADC_FREQUENCY * 1.0e6) / (double) dec_amount;
         System.out.println("Actual spectral width: " + actualSpectralWidth);
 
@@ -52,7 +68,9 @@ public class HahnEcho implements Pulse<Complex[]> {
 
         int num_points = (int) Math.floor(((scan_time) / 1e6) * actualSpectralWidth);
 
-        this.data = new Complex[num_points];
+        synchronized (this) {
+            this.data = new Complex[num_points];
+        }
 
         api.pb_set_num_points(num_points);
         api.pb_set_scan_segments(1);
@@ -131,35 +149,62 @@ public class HahnEcho implements Pulse<Complex[]> {
 
         while (api.pb_read_status() != 0x03) //Wait for the board to complete execution.
         {
-            while ((api.pb_scan_count(0) <= scan_count) && (api.pb_read_status() != 0x03)) {
-                api.pb_sleep_ms(100);
+            if (!running) {
+                break;
             }
 
-            if (api.pb_read_status() != 0x03) {
-                System.out.println("Current Scan: " + api.pb_scan_count(0));
-            }
+            api.pb_sleep_ms(100);
+            api.pb_get_data(num_points, real, imag);
 
-            scan_count++;
+            createData(real, imag);
+
+            System.out.println("Current Scan: " + api.pb_scan_count(0));
+
+//            while ((api.pb_scan_count(0) <= scan_count) && (api.pb_read_status() != 0x03)) {
+//                if (!running) {
+//                    break;
+//                }
+//
+//                api.pb_sleep_ms(100);
+//
+//                api.pb_get_data(num_points, real, imag);
+//                createData(real, imag);
+//            }
+//
+//            if (api.pb_read_status() != 0x03) {
+//                System.out.println("Current Scan: " + api.pb_scan_count(0));
+//            }
+//
+//            scan_count++;
         }
 
-        api.pb_get_data(num_points, real, imag);
+//        for (int i = 0; i < real.length; i++) {
+//            System.out.println("(" + real[i] + "," + imag[i] + ")");
+//        }
+    }
 
+    synchronized void createData(int[] real, int[] imag) {
         for (int i = 0; i < real.length; i++) {
-            System.out.println("(" + real[i] + "," + imag[i] + ")");
+            data[i] = new Complex(real[i], imag[i]);
         }
     }
 
     @Override
     public void stop() {
-        // TODO
-        
+        running = false;
+
         api.pb_stop();
     }
-    
+
     @Override
-    public Complex[] getData() {
-        // TODO
-        
-        return null;
+    synchronized public Complex[] getData() {
+        if (data == null) {
+            return null;
+        }
+
+        Complex[] copy = new Complex[data.length];
+        System.arraycopy(data, 0, copy, 0, data.length);
+
+        return copy;
     }
 }

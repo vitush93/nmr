@@ -24,6 +24,7 @@ public interface SpinAPI extends Library {
     static final int STOP = 1;
     static final int DO_TRIGGER = 1;
     static final int END_LOOP = 3;
+    static final int BYPASS_FIR = 0x0100;
 
     SpinAPI INSTANCE = (SpinAPI) Native.loadLibrary("spinapi.dll", SpinAPI.class);
 
@@ -82,4 +83,8 @@ public interface SpinAPI extends Library {
     void pb_sleep_ms(int miliseconds);
 
     int pb_get_data(int num_points, int[] real_data, int[] imag_data);
+    
+    void pb_set_debug(int debug);
+    
+    int pb_init();
 }

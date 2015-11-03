@@ -1,16 +1,14 @@
 package cz.vithabada.nmr_gui;
 
+import cz.vithabada.nmr_gui.pulse.HahnEcho;
 import cz.vithabada.nmr_gui.pulse.Pulse;
-import cz.vithabada.nmr_gui.pulse.RandomDataSource;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,6 +22,7 @@ import javafx.scene.control.MenuBar;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import libs.Complex;
+import spinapi.SpinAPI;
 
 public class MainController implements Initializable {
 
@@ -53,7 +52,8 @@ public class MainController implements Initializable {
             return;
         }
 
-        source = new RandomDataSource(16);
+        //source = new RandomDataSource(16);
+        source = new HahnEcho();
         worker = createWorker();
 
         started = true;
@@ -96,10 +96,17 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            updateChart(source.getData());
+            Complex[] data = source.getData();
+            if (data != null) {
+                updateChart(data);
+            }
         }), new KeyFrame(Duration.seconds(1)));
 
         timeline.setCycleCount(Animation.INDEFINITE);
+
+        SpinAPI api = SpinAPI.INSTANCE;
+        System.out.println("SpinAPI Version: " + api.pb_get_version());
+        System.out.println("Connected boards: " + api.pb_count_boards());
     }
 
     void updateChart(Complex[] value) {
@@ -124,7 +131,7 @@ public class MainController implements Initializable {
         lineChart.getData().add(real);
         lineChart.getData().add(imag);
     }
-    
+
     Thread createWorker() {
         worker = new Thread(() -> {
             source.start();
