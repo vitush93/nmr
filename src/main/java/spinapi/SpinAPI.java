@@ -26,7 +26,7 @@ public interface SpinAPI extends Library {
     static final int END_LOOP = 3;
     static final int BYPASS_FIR = 0x0100;
 
-    SpinAPI INSTANCE = (SpinAPI) Native.loadLibrary("spinapi.dll", SpinAPI.class);
+    SpinAPI INSTANCE = (SpinAPI) Native.loadLibrary((System.getProperty("sun.arch.data.model").contains("64")) ? "spinapi64.dll" : "spinapi.dll", SpinAPI.class);
 
     String pb_get_version();
 
