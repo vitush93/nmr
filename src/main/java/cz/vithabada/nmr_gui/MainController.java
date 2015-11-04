@@ -2,12 +2,13 @@ package cz.vithabada.nmr_gui;
 
 import cz.vithabada.nmr_gui.pulse.HahnEcho;
 import cz.vithabada.nmr_gui.pulse.Pulse;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,8 +22,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import libs.Complex;
+import libs.Invokable;
 import spinapi.SpinAPI;
 
 public class MainController implements Initializable {
@@ -35,38 +36,37 @@ public class MainController implements Initializable {
 
     @FXML
     MenuBar menuBar;
-    
+
     @FXML
     Label leftStatus;
-    
+
     @FXML
     Label rightStatus;
 
     boolean started = false;
-    Pulse<Complex[]> source;
-    Thread worker;
-    Timeline timeline;
+    Pulse<Complex[]> pulse;
 
     @FXML
     void handleStart() {
         if (started) {
             startButton.setText("Start");
-            source.stop();
-            timeline.stop();
+            pulse.stop();
 
             started = false;
 
             return;
         }
 
-        source = new HahnEcho();
-        worker = createWorker();
+        pulse = new HahnEcho();
+        initPulse();
+
+        Task pulseTask = createPulseTask();
+        Thread t = new Thread(pulseTask);
+        t.setDaemon(true);
+        t.start();
 
         started = true;
         startButton.setText("Stop");
-
-        worker.start();
-        timeline.play();
     }
 
     @FXML
@@ -101,50 +101,59 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), (ActionEvent event) -> {
-            Complex[] data = source.getData();
-            if (data != null) {
-                updateChart(data);
-            }
-        }), new KeyFrame(Duration.seconds(1)));
-
-        timeline.setCycleCount(Animation.INDEFINITE);
-
         SpinAPI api = SpinAPI.INSTANCE;
         System.out.println("SpinAPI Version: " + api.pb_get_version());
         System.out.println("Connected boards: " + api.pb_count_boards());
     }
 
-    void updateChart(Complex[] value) {
-        lineChart.getData().clear();
+    void initPulse() {
+        Invokable<Complex[]> updateChartOnFetch = createChartUpdateEvent();
 
-        final XYChart.Series<Number, Number> real = new XYChart.Series<>();
-        final XYChart.Series<Number, Number> imag = new XYChart.Series<>();
-
-        real.setName("Real");
-        imag.setName("Imaginary");
-
-        imag.getData().clear();
-
-        int count = 0;
-        for (Complex c : value) {
-            real.getData().add(new XYChart.Data(count, c.getReal()));
-            imag.getData().add(new XYChart.Data(count, c.getImag()));
-
-            count++;
-        }
-
-        lineChart.getData().add(real);
-        lineChart.getData().add(imag);
+        pulse.onFetch.add(updateChartOnFetch);
+        pulse.onComplete.add(updateChartOnFetch);
     }
 
-    Thread createWorker() {
-        worker = new Thread(() -> {
-            source.start();
+    Task createPulseTask() {
+        Task<Void> task =  new Task<Void>() {
+
+            @Override
+            protected Void call() throws Exception {
+                pulse.start();
+
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            // TODO
         });
 
-        worker.setDaemon(true);
+        task.setOnFailed(event -> {
+            // TODO
+        });
 
-        return worker;
+        return task;
+    }
+
+    Invokable<Complex[]> createChartUpdateEvent() {
+        return (sender, value) -> Platform.runLater(() -> {
+            lineChart.getData().clear();
+
+            final XYChart.Series<Number, Number> real = new XYChart.Series<>();
+            final XYChart.Series<Number, Number> imag = new XYChart.Series<>();
+
+            real.setName("Real");
+            imag.setName("Imaginary");
+
+            for (int i = 0, valueLength = value.length; i < valueLength; i++) { // TODO compute actual X axis
+                Complex c = value[i];
+
+                real.getData().add(new XYChart.Data<>(i, c.getReal()));
+                imag.getData().add(new XYChart.Data<>(i, c.getImag()));
+            }
+
+            lineChart.getData().add(real);
+            lineChart.getData().add(imag);
+        });
     }
 }

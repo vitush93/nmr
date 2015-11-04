@@ -1,9 +1,11 @@
 package cz.vithabada.nmr_gui.pulse;
 
 import libs.Complex;
+import libs.Invokable;
 import spinapi.SpinAPI;
+import java.util.List;
 
-public class HahnEcho implements Pulse<Complex[]> {
+public class HahnEcho extends Pulse<Complex[]> {
 
     final SpinAPI api;
 
@@ -22,7 +24,7 @@ public class HahnEcho implements Pulse<Complex[]> {
         double ADC_FREQUENCY = 75.0;
         double SPECTROMETER_FREQUENCY = 2;
         int SPECTRAL_WIDTH = 642;
-        int NUMBER_OF_SCANS = 1000;
+        int NUMBER_OF_SCANS = 100;
         double ECHO_TIME = 300;
         double TAU = 200;
         int P1_PHASE = 0;
@@ -52,7 +54,7 @@ public class HahnEcho implements Pulse<Complex[]> {
 
         System.out.println("desired SW: " + SPECTRAL_WIDTH / 1000.0);
 
-        int dec_amount = api.pb_setup_filters(SPECTRAL_WIDTH / 1000.0, NUMBER_OF_SCANS, api.BYPASS_FIR);
+        int dec_amount = api.pb_setup_filters(SPECTRAL_WIDTH / 1000.0, NUMBER_OF_SCANS, SpinAPI.BYPASS_FIR);
         if (dec_amount < 0) {
             System.out.println("ERROR: " + api.pb_get_error());
 
@@ -63,10 +65,9 @@ public class HahnEcho implements Pulse<Complex[]> {
         double actualSpectralWidth = (ADC_FREQUENCY * 1.0e6) / (double) dec_amount;
         System.out.println("Actual spectral width: " + actualSpectralWidth);
 
-        double scan_time = ECHO_TIME;
         double ringdown_time = TAU - 0.5 * ECHO_TIME;
 
-        int num_points = (int) Math.floor(((scan_time) / 1e6) * actualSpectralWidth);
+        int num_points = (int) Math.floor(((ECHO_TIME) / 1e6) * actualSpectralWidth);
 
         synchronized (this) {
             this.data = new Complex[num_points];
@@ -145,20 +146,27 @@ public class HahnEcho implements Pulse<Complex[]> {
         api.pb_reset();
         api.pb_start();
 
-        int scan_count = 0; // Scan count is not deterministic. Scans may be skipped or repeated
-
         while (api.pb_read_status() != 0x03) //Wait for the board to complete execution.
         {
             if (!running) {
                 break;
             }
 
-            api.pb_sleep_ms(100);
+            api.pb_sleep_ms(1000);
             api.pb_get_data(num_points, real, imag);
 
             createData(real, imag);
+            invokeEvent(onFetch, data);
 
             System.out.println("Current Scan: " + api.pb_scan_count(0));
+        }
+
+        invokeEvent(onComplete, data);
+    }
+
+    synchronized <T> void invokeEvent(List<Invokable<T>> event, T argument) {
+        for (Invokable<T> invokable : event) {
+            invokable.invoke(this, argument);
         }
     }
 

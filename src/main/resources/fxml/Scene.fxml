@@ -32,7 +32,7 @@
                     <children>
                         <LineChart createSymbols="false"  fx:id="lineChart" layoutX="70.0" animated="false"  layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <xAxis>
-                                <NumberAxis label="Frequency" side="BOTTOM" />
+                                <NumberAxis label="Time" side="BOTTOM" />
                             </xAxis>
                             <yAxis>
                                 <NumberAxis label="Value" side="LEFT" />

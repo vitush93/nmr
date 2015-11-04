@@ -4,3 +4,4 @@ target/
 *.iml
 /out/
 .idea_modules/
+log_*.txt

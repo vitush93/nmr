@@ -2,9 +2,11 @@ package cz.vithabada.nmr_gui.pulse;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import libs.Complex;
 
-public class RandomDataSource implements Pulse<Complex[]> {
+import libs.Complex;
+import libs.Invokable;
+
+public class RandomDataSource extends Pulse<Complex[]> {
 
     final int length;
 
@@ -26,19 +28,27 @@ public class RandomDataSource implements Pulse<Complex[]> {
                 break;
             }
 
-            synchronized (this) {
-                data = new Complex[length];
-
-                for (int i = 0; i < length; i++) {
-                    data[i] = new Complex((int) (Math.random() * 10), (int) (Math.random() * 10));
-                }
-            }
+            generateData();
 
             try {
                 Thread.sleep(200);
             } catch (InterruptedException ex) {
                 Logger.getLogger(RandomDataSource.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+
+        generateData();
+
+        for (Invokable<Complex[]> event : onComplete) {
+            event.invoke(this, getData());
+        }
+    }
+
+    synchronized void generateData() {
+        data = new Complex[length];
+
+        for (int i = 0; i < length; i++) {
+            data[i] = new Complex((int) (Math.random() * 10), (int) (Math.random() * 10));
         }
     }
 
