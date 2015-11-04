@@ -3,6 +3,7 @@ package cz.vithabada.nmr_gui.pulse;
 import libs.Complex;
 import libs.Invokable;
 import spinapi.SpinAPI;
+
 import java.util.List;
 
 public class HahnEcho extends Pulse<Complex[]> {
@@ -155,22 +156,22 @@ public class HahnEcho extends Pulse<Complex[]> {
             api.pb_sleep_ms(1000);
             api.pb_get_data(num_points, real, imag);
 
-            createData(real, imag);
-            invokeEvent(onFetch, data);
+            synchronized (this) {
+                createData(real, imag);
+                onFetch.invoke(this, data);
+                onRefresh.invoke(this, api.pb_scan_count(0));
+            }
 
             System.out.println("Current Scan: " + api.pb_scan_count(0));
         }
 
-        invokeEvent(onComplete, data);
-    }
-
-    synchronized <T> void invokeEvent(List<Invokable<T>> event, T argument) {
-        for (Invokable<T> invokable : event) {
-            invokable.invoke(this, argument);
+        synchronized (this) {
+            onComplete.invoke(this, data);
+            onRefresh.invoke(this, NUMBER_OF_SCANS);
         }
     }
 
-    synchronized void createData(int[] real, int[] imag) {
+    void createData(int[] real, int[] imag) {
         for (int i = 0; i < real.length; i++) {
             data[i] = new Complex(real[i], imag[i]);
         }

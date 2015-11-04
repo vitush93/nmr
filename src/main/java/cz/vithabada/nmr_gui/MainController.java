@@ -22,6 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.stage.Stage;
+import libs.AlertHelper;
 import libs.Complex;
 import libs.Invokable;
 import spinapi.SpinAPI;
@@ -44,16 +45,22 @@ public class MainController implements Initializable {
     Label rightStatus;
 
     boolean started = false;
+
+    boolean boardConnected = true; // TODO periodically check for board
+
     Pulse<Complex[]> pulse;
 
     @FXML
     void handleStart() {
         if (started) {
-            startButton.setText("Start");
             pulse.stop();
+            setReadyState();
 
-            started = false;
+            return;
+        }
 
+        if (!boardConnected) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "No boards detected", "RadioProcessor is not connected.");
             return;
         }
 
@@ -61,23 +68,18 @@ public class MainController implements Initializable {
         initPulse();
 
         Task pulseTask = createPulseTask();
+
         Thread t = new Thread(pulseTask);
         t.setDaemon(true);
         t.start();
 
-        started = true;
-        startButton.setText("Stop");
+        setRunningState();
     }
 
     @FXML
     void handleOpenAttenuatorWindow(ActionEvent event) throws IOException {
         if (started) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Warning");
-            alert.setHeaderText(null);
-            alert.setContentText("Data retrieval is currently running. Stop the pulse execution first to configure the USB Attenuator.");
-
-            alert.showAndWait();
+            AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Warning", "Data retrieval is currently running. Stop the pulse execution first to configure the USB Attenuator.");
 
             return;
         }
@@ -102,19 +104,21 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         SpinAPI api = SpinAPI.INSTANCE;
-        System.out.println("SpinAPI Version: " + api.pb_get_version());
-        System.out.println("Connected boards: " + api.pb_count_boards());
+
+        String boardStatus = String.format("SpinAPI Version: %s, Connected boards: %d", api.pb_get_version(), api.pb_count_boards());
+        rightStatus.setText(boardStatus);
     }
 
     void initPulse() {
         Invokable<Complex[]> updateChartOnFetch = createChartUpdateEvent();
 
-        pulse.onFetch.add(updateChartOnFetch);
-        pulse.onComplete.add(updateChartOnFetch);
+        pulse.onFetch = updateChartOnFetch;
+        pulse.onComplete = updateChartOnFetch;
+        pulse.onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
     }
 
     Task createPulseTask() {
-        Task<Void> task =  new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
 
             @Override
             protected Void call() throws Exception {
@@ -125,11 +129,11 @@ public class MainController implements Initializable {
         };
 
         task.setOnSucceeded(event -> {
-            // TODO
+            setReadyState();
         });
 
         task.setOnFailed(event -> {
-            // TODO
+            leftStatus.setText("Error has occured during program execution");
         });
 
         return task;
@@ -155,5 +159,22 @@ public class MainController implements Initializable {
             lineChart.getData().add(real);
             lineChart.getData().add(imag);
         });
+    }
+
+    void setReadyState() {
+        started = false;
+
+        leftStatus.setText("Ready");
+        startButton.setText("Start");
+    }
+
+    void setRunningState() {
+        started = true;
+
+        startButton.setText("Stop");
+    }
+
+    void startCheckForBoardBackgroundTask() {
+        // TODO update boardConnected
     }
 }

@@ -2,20 +2,19 @@ package cz.vithabada.nmr_gui.pulse;
 
 import libs.Invokable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class Pulse<T> {
 
-    public List<Invokable<T>> onFetch = new ArrayList<>();
+    public Invokable<Number> onRefresh;
 
-    public List<Invokable<T>> onComplete = new ArrayList<>();
+    public Invokable<T> onFetch;
 
-    public List<Invokable<Void>> onError = new ArrayList<>();
-    
+    public Invokable<T> onComplete;
+
+    public Invokable<Void> onError;
+
     public abstract void start();
-    
+
     public abstract void stop();
-    
+
     public abstract T getData();
 }

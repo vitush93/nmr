@@ -23,24 +23,28 @@ public class RandomDataSource extends Pulse<Complex[]> {
     public void start() {
         running = true;
 
+        int count = 0;
         while (true) {
             if (!running) {
                 break;
             }
 
-            generateData();
+            synchronized (this) {
+                generateData();
+                onFetch.invoke(this, data);
+                onRefresh.invoke(this, count++);
+            }
 
             try {
-                Thread.sleep(200);
+                Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(RandomDataSource.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
-        generateData();
-
-        for (Invokable<Complex[]> event : onComplete) {
-            event.invoke(this, getData());
+        synchronized (this) {
+            generateData();
+            onComplete.invoke(this, data);
         }
     }
 
@@ -58,7 +62,7 @@ public class RandomDataSource extends Pulse<Complex[]> {
     }
 
     @Override
-    public synchronized Complex[] getData() {
+    public Complex[] getData() {
         return data;
     }
 }
