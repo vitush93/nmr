@@ -188,7 +188,10 @@ public class MainController implements Initializable {
             }
         };
 
-        task.setOnSucceeded(event -> setReadyState());
+        task.setOnSucceeded(event -> {
+            setReadyState();
+            AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Done", "Data capture has been successfully completed.");
+        });
 
         task.setOnFailed(event -> {
             setReadyState();
