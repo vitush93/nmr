@@ -3,8 +3,7 @@ package cz.vithabada.nmr_gui.pulse;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import libs.Complex;
-import libs.Invokable;
+import org.apache.commons.math3.complex.Complex;
 
 public class RandomDataSource extends Pulse<Complex[]> {
 

@@ -27,14 +27,18 @@ import javafx.scene.control.MenuBar;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import libs.AlertHelper;
-import libs.Complex;
+import libs.FFT;
 import libs.Invokable;
+import org.apache.commons.math3.complex.Complex;
 import spinapi.SpinAPI;
 
 public class MainController implements Initializable {
 
     @FXML
-    LineChart<Number, Number> lineChart;
+    LineChart<Number, Number> dataChart;
+
+    @FXML
+    LineChart<Number, Number> fftChart;
 
     @FXML
     Button startButton;
@@ -161,10 +165,10 @@ public class MainController implements Initializable {
      * Initialize pulse's callbacks.
      */
     void initPulse() {
-        Invokable<Complex[]> updateChartOnFetch = createChartUpdateEvent();
+        Invokable<Complex[]> updateCharts = createChartUpdateEvent();
 
-        pulse.onFetch = updateChartOnFetch;
-        pulse.onComplete = updateChartOnFetch;
+        pulse.onFetch = updateCharts;
+        pulse.onComplete = updateCharts;
         pulse.onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
     }
 
@@ -186,17 +190,21 @@ public class MainController implements Initializable {
 
         task.setOnSucceeded(event -> setReadyState());
 
-        task.setOnFailed(event -> leftStatus.setText("Error has occured during program execution"));
+        task.setOnFailed(event -> {
+            setReadyState();
+
+            leftStatus.setText("Error has occured during program execution: " + event.getSource().getException().getMessage());
+        });
 
         return task;
     }
 
     /**
-     * Factory forc chart update invokable.
+     * Factory for chart update invokable.
      *
      * @return chart update invokable
      */
-    Invokable<Complex[]> createChartUpdateEvent() {
+    Invokable<Complex[]> createChartUpdateEvent(LineChart<Number, Number> lineChart) {
         return (sender, value) -> Platform.runLater(() -> {
             lineChart.getData().clear();
 
@@ -210,12 +218,31 @@ public class MainController implements Initializable {
                 Complex c = value[i];
 
                 real.getData().add(new XYChart.Data<>(i, c.getReal()));
-                imag.getData().add(new XYChart.Data<>(i, c.getImag()));
+                imag.getData().add(new XYChart.Data<>(i, c.getImaginary()));
             }
 
             lineChart.getData().add(real);
             lineChart.getData().add(imag);
         });
+    }
+
+    /**
+     * Factory for chart update invokable.
+     * Wraps the createChartUpdateEvent(LineChart).
+     * Updates both data plot and fft plot.
+     *
+     * @return chart update invokable
+     */
+    Invokable<Complex[]> createChartUpdateEvent() {
+        return (sender, value) -> {
+            Invokable<Complex[]> dataChartUpdate = createChartUpdateEvent(dataChart);
+            dataChartUpdate.invoke(sender, value);
+
+            Invokable<Complex[]> fftChartUpdate = createChartUpdateEvent(fftChart);
+
+            Complex[] transformed = FFT.transform(value);
+            fftChartUpdate.invoke(sender, transformed);
+        };
     }
 
     /**

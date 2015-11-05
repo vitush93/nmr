@@ -45,7 +45,7 @@
                                  <tabs>
                                     <Tab closable="false" text="Data Plot">
                                        <content>
-                                          <LineChart fx:id="lineChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <LineChart fx:id="dataChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <xAxis>
                                                 <NumberAxis label="Time" side="BOTTOM" />
                                              </xAxis>
@@ -55,7 +55,18 @@
                                           </LineChart>
                                        </content>
                                     </Tab>
-                                    <Tab closable="false" text="FFT Plot" />
+                                    <Tab closable="false" text="FFT Plot">
+                                        <content>
+                                            <LineChart fx:id="fftChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                <xAxis>
+                                                    <NumberAxis label="Time" side="BOTTOM" />
+                                                </xAxis>
+                                                <yAxis>
+                                                    <NumberAxis label="Value" side="LEFT" />
+                                                </yAxis>
+                                            </LineChart>
+                                        </content>
+                                    </Tab>
                                  </tabs>
                               </TabPane>
                            </children>

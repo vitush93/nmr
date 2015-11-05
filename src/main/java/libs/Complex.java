@@ -1,5 +1,8 @@
 package libs;
 
+/**
+ * @deprecated use org.apache.commons.math3.complex.Complex instead.
+ */
 public class Complex {
 
     int real;

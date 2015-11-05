@@ -1,7 +1,9 @@
 package cz.vithabada.nmr_gui.pulse;
 
-import libs.Complex;
+//import libs.Complex;
+
 import libs.Invokable;
+import org.apache.commons.math3.complex.Complex;
 import spinapi.SpinAPI;
 
 import java.util.List;
