@@ -8,7 +8,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import libs.AlertHelper;
-import spinapi.SpinAPI;
 
 public class MainApp extends Application {
 
@@ -26,7 +25,10 @@ public class MainApp extends Application {
             return;
         }
 
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"));
+        Parent root = loader.load();
+        MainController mainController = loader.getController();
+        mainController.init(stage);
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");

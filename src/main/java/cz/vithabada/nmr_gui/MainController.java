@@ -2,11 +2,6 @@ package cz.vithabada.nmr_gui;
 
 import cz.vithabada.nmr_gui.pulse.HahnEcho;
 import cz.vithabada.nmr_gui.pulse.Pulse;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -32,6 +27,10 @@ import libs.Invokable;
 import org.apache.commons.math3.complex.Complex;
 import spinapi.SpinAPI;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 public class MainController implements Initializable {
 
     @FXML
@@ -55,6 +54,8 @@ public class MainController implements Initializable {
     @FXML
     Label rightStatus;
 
+    Stage stage;
+
     /**
      * Indicates whether the data capture is running.
      */
@@ -71,6 +72,11 @@ public class MainController implements Initializable {
      * Pulse to be executed. Allows running data capture to be stopped from any method in this class.
      */
     Pulse<Complex[]> pulse;
+
+    /**
+     * Task which contains pulse execution.
+     */
+    Task pulseTask;
 
     /**
      * Starts currently selected pulse with given parameters.
@@ -91,7 +97,7 @@ public class MainController implements Initializable {
         // TODO verify pulse parameters
 
         // start data capture task in background thread
-        Task pulseTask = createPulseTask();
+        pulseTask = createPulseTask();
 
         Thread t = new Thread(pulseTask);
         t.setDaemon(true);
@@ -107,9 +113,8 @@ public class MainController implements Initializable {
      */
     @FXML
     void handleStop() {
+        pulseTask.setOnSucceeded(event -> setReadyState());
         pulse.stop();
-
-        setReadyState();
     }
 
     /**
@@ -144,11 +149,12 @@ public class MainController implements Initializable {
      */
     @FXML
     void handleQuit() {
-        Stage stage = (Stage) menuBar.getScene().getWindow();
-
-        stage.close();
-
-        // TODO soft quit: ask RadioProcessor to stop data capture first
+        if (running) {
+            pulseTask.setOnSucceeded(event -> stage.close());
+            pulse.stop();
+        } else {
+            stage.close();
+        }
     }
 
     @Override
@@ -294,5 +300,11 @@ public class MainController implements Initializable {
 
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+    }
+
+    public void init(Stage stage) {
+        this.stage = stage;
+
+        this.stage.setOnCloseRequest(event -> handleQuit());
     }
 }

@@ -179,6 +179,13 @@ public class HahnEcho extends Pulse<Complex[]> {
         running = false;
 
         api.pb_stop();
+
+        // wait for RadioProcessor to stop pulse execution
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
