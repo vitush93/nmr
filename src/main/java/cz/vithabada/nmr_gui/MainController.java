@@ -51,46 +51,80 @@ public class MainController implements Initializable {
     @FXML
     Label rightStatus;
 
+    /**
+     * Indicates whether the data capture is running.
+     */
     boolean running = false;
 
+    /**
+     * Indicated whether the RadioProcessor is connected.
+     * Is continuously updated in background task which asks for board's presence
+     * every 500 milisecons.
+     */
     boolean boardConnected = false;
 
+    /**
+     * Pulse to be executed. Allows running data capture to be stopped from any method in this class.
+     */
     Pulse<Complex[]> pulse;
 
+    /**
+     * Starts currently selected pulse with given parameters.
+     * If no board is connected, displays alert window.
+     */
     @FXML
     void handleStart() {
-        if (!boardConnected) {
+        if (!boardConnected) { // board is not present - display alert
             AlertHelper.showAlert(Alert.AlertType.ERROR, "No boards detected", "RadioProcessor is not connected.");
 
             return;
         }
 
-        pulse = new HahnEcho(); // TODO pulse based on selected tab
+        // TODO instantiate pulse wrapper based on currently selected tab and initialize its events
+        pulse = new HahnEcho();
         initPulse();
 
+        // TODO verify pulse parameters
+
+        // start data capture task in background thread
         Task pulseTask = createPulseTask();
 
         Thread t = new Thread(pulseTask);
         t.setDaemon(true);
         t.start();
 
+        // update UI to running state
         setRunningState();
     }
 
+    /**
+     * Asks RadioProcessor to stop capturing data which results in pulse
+     * task succeeding and thus ending the pulse execution.
+     */
     @FXML
     void handleStop() {
         pulse.stop();
+
         setReadyState();
     }
 
+    /**
+     * Displays window to configure the Attenuator.
+     * If data capture is running, displays alert window
+     * and prevents user to configure the Attenuator.
+     *
+     * @param event event args
+     * @throws IOException
+     */
     @FXML
     void handleOpenAttenuatorWindow(ActionEvent event) throws IOException {
-        if (running) {
+        if (running) { // prevent user to setup the Attenuator if data capture is running
             AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Warning", "Data retrieval is currently running. Stop the pulse execution first to configure the USB Attenuator.");
 
             return;
         }
 
+        // show Attenuator configuration window
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Attenuator.fxml"));
 
         Stage stage = new Stage();
@@ -101,24 +135,31 @@ public class MainController implements Initializable {
         stage.show();
     }
 
+    /**
+     * Simply quits the entire application.
+     */
     @FXML
     void handleQuit() {
         Stage stage = (Stage) menuBar.getScene().getWindow();
 
         stage.close();
+
+        // TODO soft quit: ask RadioProcessor to stop data capture first
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        SpinAPI api = SpinAPI.INSTANCE;
 
-        String boardStatus = String.format("SpinAPI Version: %s, Connected boards: %d", api.pb_get_version(), api.pb_count_boards());
-        rightStatus.setText(boardStatus);
+        // display API version and connected board count in right status.
+        setRightStatus(SpinAPI.INSTANCE.pb_get_version(), SpinAPI.INSTANCE.pb_count_boards());
 
         setReadyState();
         startCheckForBoardBackgroundTask();
     }
 
+    /**
+     * Initialize pulse's callbacks.
+     */
     void initPulse() {
         Invokable<Complex[]> updateChartOnFetch = createChartUpdateEvent();
 
@@ -127,6 +168,11 @@ public class MainController implements Initializable {
         pulse.onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
     }
 
+    /**
+     * Factory for pulse task in which data capture itself is running.
+     *
+     * @return pulse task.
+     */
     Task createPulseTask() {
         Task<Void> task = new Task<Void>() {
 
@@ -145,6 +191,11 @@ public class MainController implements Initializable {
         return task;
     }
 
+    /**
+     * Factory forc chart update invokable.
+     *
+     * @return chart update invokable
+     */
     Invokable<Complex[]> createChartUpdateEvent() {
         return (sender, value) -> Platform.runLater(() -> {
             lineChart.getData().clear();
@@ -167,6 +218,9 @@ public class MainController implements Initializable {
         });
     }
 
+    /**
+     * Updates UI to ready state: ready to start data capture - equivalent to initial state.
+     */
     void setReadyState() {
         running = false;
 
@@ -176,6 +230,9 @@ public class MainController implements Initializable {
         stopButton.setDisable(true);
     }
 
+    /**
+     * Updates UI to running state: state during the data capture.
+     */
     void setRunningState() {
         running = true;
 
@@ -183,8 +240,28 @@ public class MainController implements Initializable {
         stopButton.setDisable(false);
     }
 
+    /**
+     * Updates rightStatus label with SpinAPI information.
+     *
+     * @param apiVersion      SpinAPI version string.
+     * @param connectedBoards number of connected SpinCore boards.
+     */
+    void setRightStatus(String apiVersion, int connectedBoards) {
+        String boardStatus = String.format("SpinAPI Version: %s, Connected boards: %d", apiVersion, connectedBoards);
+
+        rightStatus.setText(boardStatus);
+    }
+
+    /**
+     * Starts background task which continuously checks if RadioProcessor is connected.
+     */
     void startCheckForBoardBackgroundTask() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0), event -> boardConnected = (SpinAPI.INSTANCE.pb_count_boards() > 0)), new KeyFrame(Duration.millis(500)));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0), event -> {
+            boardConnected = (SpinAPI.INSTANCE.pb_count_boards() > 0);
+
+            setRightStatus(SpinAPI.INSTANCE.pb_get_version(), SpinAPI.INSTANCE.pb_count_boards());
+        }), new KeyFrame(Duration.millis(500)));
+
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
