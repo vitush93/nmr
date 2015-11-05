@@ -115,9 +115,24 @@
                   </GridPane>
                </content>
             </Tab>
+            <Tab closable="false" text="Local Data">
+               <content>
+                  <GridPane>
+                     <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <Label text="Data table" />
+                     </children>
+                  </GridPane>
+               </content>
+            </Tab>
          </tabs>
       </TabPane>
-        <HBox styleClass="status-bar" id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
+        <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" styleClass="status-bar" VBox.vgrow="NEVER">
             <children>
                 <Label fx:id="leftStatus" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Ready" HBox.hgrow="ALWAYS">
                     <font>

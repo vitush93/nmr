@@ -19,6 +19,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import libs.AlertHelper;
@@ -137,6 +138,8 @@ public class MainController implements Initializable {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Attenuator.fxml"));
 
         Stage stage = new Stage();
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(this.stage.getScene().getWindow());
         stage.setTitle("USB Attenuator");
         stage.setScene(new Scene(root, 300, 100));
         stage.setResizable(false);
