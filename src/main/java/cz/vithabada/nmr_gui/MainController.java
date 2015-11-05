@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -22,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import libs.AlertHelper;
 import libs.Complex;
 import libs.Invokable;
@@ -49,7 +53,7 @@ public class MainController implements Initializable {
 
     boolean running = false;
 
-    boolean boardConnected = true; // TODO periodically check for board
+    boolean boardConnected = false;
 
     Pulse<Complex[]> pulse;
 
@@ -112,6 +116,7 @@ public class MainController implements Initializable {
         rightStatus.setText(boardStatus);
 
         setReadyState();
+        startCheckForBoardBackgroundTask();
     }
 
     void initPulse() {
@@ -133,13 +138,9 @@ public class MainController implements Initializable {
             }
         };
 
-        task.setOnSucceeded(event -> {
-            setReadyState();
-        });
+        task.setOnSucceeded(event -> setReadyState());
 
-        task.setOnFailed(event -> {
-            leftStatus.setText("Error has occured during program execution");
-        });
+        task.setOnFailed(event -> leftStatus.setText("Error has occured during program execution"));
 
         return task;
     }
@@ -183,6 +184,8 @@ public class MainController implements Initializable {
     }
 
     void startCheckForBoardBackgroundTask() {
-        // TODO update boardConnected
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0), event -> boardConnected = (SpinAPI.INSTANCE.pb_count_boards() > 0)), new KeyFrame(Duration.millis(500)));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
     }
 }
