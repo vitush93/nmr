@@ -36,6 +36,9 @@ public class MainController implements Initializable {
     Button startButton;
 
     @FXML
+    Button stopButton;
+
+    @FXML
     MenuBar menuBar;
 
     @FXML
@@ -44,7 +47,7 @@ public class MainController implements Initializable {
     @FXML
     Label rightStatus;
 
-    boolean started = false;
+    boolean running = false;
 
     boolean boardConnected = true; // TODO periodically check for board
 
@@ -52,19 +55,13 @@ public class MainController implements Initializable {
 
     @FXML
     void handleStart() {
-        if (started) {
-            pulse.stop();
-            setReadyState();
-
-            return;
-        }
-
         if (!boardConnected) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "No boards detected", "RadioProcessor is not connected.");
+
             return;
         }
 
-        pulse = new HahnEcho();
+        pulse = new HahnEcho(); // TODO pulse based on selected tab
         initPulse();
 
         Task pulseTask = createPulseTask();
@@ -77,8 +74,14 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    void handleStop() {
+        pulse.stop();
+        setReadyState();
+    }
+
+    @FXML
     void handleOpenAttenuatorWindow(ActionEvent event) throws IOException {
-        if (started) {
+        if (running) {
             AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Warning", "Data retrieval is currently running. Stop the pulse execution first to configure the USB Attenuator.");
 
             return;
@@ -107,6 +110,8 @@ public class MainController implements Initializable {
 
         String boardStatus = String.format("SpinAPI Version: %s, Connected boards: %d", api.pb_get_version(), api.pb_count_boards());
         rightStatus.setText(boardStatus);
+
+        setReadyState();
     }
 
     void initPulse() {
@@ -162,16 +167,19 @@ public class MainController implements Initializable {
     }
 
     void setReadyState() {
-        started = false;
+        running = false;
 
         leftStatus.setText("Ready");
-        startButton.setText("Start");
+
+        startButton.setDisable(false);
+        stopButton.setDisable(true);
     }
 
     void setRunningState() {
-        started = true;
+        running = true;
 
-        startButton.setText("Stop");
+        startButton.setDisable(true);
+        stopButton.setDisable(false);
     }
 
     void startCheckForBoardBackgroundTask() {

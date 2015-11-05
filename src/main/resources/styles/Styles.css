@@ -1,5 +1,5 @@
-.button {
-    -fx-font-weight: bold;
+.action-button {
+    -fx-font-size: 15;
 }
 
 .chart-series-line {    
