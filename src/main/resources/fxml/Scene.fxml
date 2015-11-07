@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.chart.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
@@ -7,7 +8,7 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="500.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.MainController">
+<VBox prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.MainController">
     <children>
         <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
             <menus>
@@ -81,17 +82,116 @@
                                                                 <children>
                                                                     <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                         <columnConstraints>
-                                                                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                                         </columnConstraints>
                                                                         <rowConstraints>
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                         </rowConstraints>
                                                                         <children>
-                                                                            <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleStart" styleClass="action-button" text="Start" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-                                                                            <Button fx:id="stopButton" mnemonicParsing="false" onAction="#handleStop" styleClass="action-button" text="Stop" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                                            <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleStart" styleClass="action-button" text="Start" GridPane.halignment="CENTER" GridPane.rowIndex="16" />
+                                                                            <Button fx:id="stopButton" mnemonicParsing="false" onAction="#handleStop" styleClass="action-button" text="Stop" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="16" />
+                                                            <Label text="ADC Freq (MHz)" GridPane.rowIndex="1" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Spectr. Freq (MHz)" GridPane.rowIndex="2" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Spectral Width (kHz)" GridPane.rowIndex="3" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Scans" GridPane.rowIndex="4" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Echo time" GridPane.rowIndex="5" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Tau (µs)" GridPane.rowIndex="6" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="P1 Phase (deg)" GridPane.rowIndex="7" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="P2 Phase (deg)" GridPane.rowIndex="8" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="8">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="P1 Time (µs)" GridPane.rowIndex="9" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="9">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="P2 Time(µs)" GridPane.rowIndex="10" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="10">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Blanking bit" GridPane.rowIndex="11" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="11">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Blanking delay (ms)" GridPane.rowIndex="12" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="12">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Amplitude" GridPane.rowIndex="13" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="13">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <Label text="Repetition delay (s)" GridPane.rowIndex="14" />
+                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="14">
+                                                               <GridPane.margin>
+                                                                  <Insets left="20.0" right="20.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
                                                                         </children>
                                                                     </GridPane>
                                                                 </children>
@@ -115,7 +215,7 @@
             </Tab>
             <Tab closable="false" text="Local Data">
                <content>
-                   <fx:include source="DataTab.fxml" fx:id="dataTab" />
+                   <fx:include fx:id="dataTab" source="DataTab.fxml" />
                </content>
             </Tab>
          </tabs>
