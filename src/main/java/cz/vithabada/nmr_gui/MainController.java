@@ -1,5 +1,8 @@
 package cz.vithabada.nmr_gui;
 
+import com.dooapp.fxform.FXForm;
+import cz.vithabada.nmr_gui.forms.FormFactory;
+import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.pulse.HahnEcho;
 import cz.vithabada.nmr_gui.pulse.Pulse;
 import javafx.animation.Animation;
@@ -19,6 +22,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -29,11 +33,19 @@ import libs.Invokable;
 import org.apache.commons.math3.complex.Complex;
 import spinapi.SpinAPI;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public class MainController implements Initializable {
+
+    @FXML
+    AnchorPane hahnContainer;
 
     @FXML
     GridPane dataTab;
@@ -87,6 +99,11 @@ public class MainController implements Initializable {
     Task pulseTask;
 
     /**
+     * Holds HahnEcho form values.
+     */
+    HahnEchoParameters hahnEchoParameters = new HahnEchoParameters();
+
+    /**
      * Starts currently selected pulse with given parameters.
      * If no board is connected, displays alert window.
      */
@@ -98,11 +115,19 @@ public class MainController implements Initializable {
             return;
         }
 
-        // TODO instantiate pulse wrapper based on currently selected tab and initialize its events
-        pulse = new HahnEcho();
-        initPulse();
+        // TODO refactor validation so that it can be used with other pulses
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<HahnEchoParameters>> constraintViolationSet = validator.validate(hahnEchoParameters);
 
-        // TODO verify pulse parameters
+        if (constraintViolationSet.size() > 0) {
+            constraintViolationSet.stream().forEach(violation -> AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid value", "Invalid value for " + violation.getPropertyPath() + ": " + violation.getMessage()));
+
+            return;
+        }
+
+        pulse = createPulse();
+        initPulse();
 
         // start data capture task in background thread
         pulseTask = createPulseTask();
@@ -113,6 +138,16 @@ public class MainController implements Initializable {
 
         // update UI to running state
         setRunningState();
+    }
+
+    Pulse<Complex[]> createPulse() {
+        // TODO instantiate pulse wrapper based on currently selected tab and initialize its events
+
+        return new HahnEcho();
+    }
+
+    void checkBoard() {
+
     }
 
     /**
@@ -175,6 +210,9 @@ public class MainController implements Initializable {
 
         setReadyState();
         startCheckForBoardBackgroundTask();
+
+        FXForm hahnForm = FormFactory.create(rb, hahnEchoParameters, "/fxml/HahnEchoForm.fxml");
+        hahnContainer.getChildren().add(hahnForm);
     }
 
     /**

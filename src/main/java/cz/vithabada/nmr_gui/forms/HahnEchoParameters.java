@@ -2,23 +2,29 @@ package cz.vithabada.nmr_gui.forms;
 
 import javafx.beans.property.*;
 
-public class HahnEchoParameters {
+import javax.validation.constraints.Max;
 
-    DoubleProperty adcFrequency = new SimpleDoubleProperty();
-    DoubleProperty spectrometerFrequency = new SimpleDoubleProperty();
-    IntegerProperty spectralWidth = new SimpleIntegerProperty();
-    IntegerProperty numberOfScans = new SimpleIntegerProperty();
-    DoubleProperty echoTime = new SimpleDoubleProperty();
-    DoubleProperty tau = new SimpleDoubleProperty();
-    IntegerProperty p1Phase = new SimpleIntegerProperty();
-    IntegerProperty p2Phase = new SimpleIntegerProperty();
-    IntegerProperty p1Time = new SimpleIntegerProperty();
-    IntegerProperty p2Time = new SimpleIntegerProperty();
-    IntegerProperty blankingBit = new SimpleIntegerProperty();
-    DoubleProperty blankingDelay = new SimpleDoubleProperty();
-    FloatProperty amplitude = new SimpleFloatProperty();
-    DoubleProperty repetitionDelay = new SimpleDoubleProperty();
+public class HahnEchoParameters extends Parameters {
 
+    // TODO names of properties eg. adcFrequency -> ADC Frequency (MHz)
+    // TODO pulse parameters constraints
+
+    DoubleProperty adcFrequency = new SimpleDoubleProperty(75);
+    DoubleProperty spectrometerFrequency = new SimpleDoubleProperty(2);
+    IntegerProperty spectralWidth = new SimpleIntegerProperty(642);
+    IntegerProperty numberOfScans = new SimpleIntegerProperty(100);
+    DoubleProperty echoTime = new SimpleDoubleProperty(300);
+    DoubleProperty tau = new SimpleDoubleProperty(200);
+    IntegerProperty p1Phase = new SimpleIntegerProperty(0);
+    IntegerProperty p2Phase = new SimpleIntegerProperty(0);
+    IntegerProperty p1Time = new SimpleIntegerProperty(5);
+    IntegerProperty p2Time = new SimpleIntegerProperty(10);
+    IntegerProperty blankingBit = new SimpleIntegerProperty(2);
+    DoubleProperty blankingDelay = new SimpleDoubleProperty(0.002);
+    FloatProperty amplitude = new SimpleFloatProperty(0.3f);
+    DoubleProperty repetitionDelay = new SimpleDoubleProperty(0.1);
+
+    @Max(value = 10)
     public double getAdcFrequency() {
         return adcFrequency.get();
     }

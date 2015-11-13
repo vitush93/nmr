@@ -8,233 +8,178 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.MainController">
+<VBox prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cz.vithabada.nmr_gui.MainController">
     <children>
         <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleQuit" text="Quit" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleQuit" text="Quit"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Devices">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleOpenAttenuatorWindow" text="Attenuator" />
-                        <MenuItem mnemonicParsing="false" text="USB-PTS" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleOpenAttenuatorWindow" text="Attenuator"/>
+                        <MenuItem mnemonicParsing="false" text="USB-PTS"/>
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
-      <TabPane VBox.vgrow="ALWAYS">
-         <tabs>
-            <Tab closable="false" text="Data Capture">
-               <content>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                           <children>
-                              <TabPane nodeOrientation="LEFT_TO_RIGHT" side="RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <tabs>
-                                    <Tab closable="false" text="Data Plot">
-                                       <content>
-                                          <LineChart fx:id="dataChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <xAxis>
-                                                <NumberAxis label="Time" side="BOTTOM" />
-                                             </xAxis>
-                                             <yAxis>
-                                                <NumberAxis label="Value" side="LEFT" />
-                                             </yAxis>
-                                          </LineChart>
-                                       </content>
-                                    </Tab>
-                                    <Tab closable="false" text="FFT Plot">
-                                        <content>
-                                            <LineChart fx:id="fftChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                <xAxis>
-                                                    <NumberAxis label="Time" side="BOTTOM" />
-                                                </xAxis>
-                                                <yAxis>
-                                                    <NumberAxis label="Value" side="LEFT" />
-                                                </yAxis>
-                                            </LineChart>
-                                        </content>
-                                    </Tab>
-                                 </tabs>
-                              </TabPane>
-                           </children>
-                        </AnchorPane>
-                            <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
-                                <children>
-                                    <TabPane side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                        <tabs>
-                                            <Tab text="Hahn Echo">
-                                                <content>
-                                                    <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
-                                                        <content>
-                                                            <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                                                                <children>
-                                                                    <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                                        <columnConstraints>
-                                                                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                                        </columnConstraints>
-                                                                        <rowConstraints>
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                        </rowConstraints>
-                                                                        <children>
-                                                                            <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleStart" styleClass="action-button" text="Start" GridPane.halignment="CENTER" GridPane.rowIndex="16" />
-                                                                            <Button fx:id="stopButton" mnemonicParsing="false" onAction="#handleStop" styleClass="action-button" text="Stop" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="16" />
-                                                            <Label text="ADC Freq (MHz)" GridPane.rowIndex="1" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Spectr. Freq (MHz)" GridPane.rowIndex="2" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Spectral Width (kHz)" GridPane.rowIndex="3" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Scans" GridPane.rowIndex="4" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Echo time" GridPane.rowIndex="5" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="5">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Tau (µs)" GridPane.rowIndex="6" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="6">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="P1 Phase (deg)" GridPane.rowIndex="7" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="7">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="P2 Phase (deg)" GridPane.rowIndex="8" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="8">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="P1 Time (µs)" GridPane.rowIndex="9" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="9">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="P2 Time(µs)" GridPane.rowIndex="10" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="10">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Blanking bit" GridPane.rowIndex="11" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="11">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Blanking delay (ms)" GridPane.rowIndex="12" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="12">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Amplitude" GridPane.rowIndex="13" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="13">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                            <Label text="Repetition delay (s)" GridPane.rowIndex="14" />
-                                                            <TextField GridPane.columnIndex="1" GridPane.rowIndex="14">
-                                                               <GridPane.margin>
-                                                                  <Insets left="20.0" right="20.0" />
-                                                               </GridPane.margin>
-                                                            </TextField>
-                                                                        </children>
-                                                                    </GridPane>
-                                                                </children>
-                                                            </AnchorPane>
-                                                        </content>
-                                                    </ScrollPane>
-                                                </content>
-                                            </Tab>
-                                            <Tab text="CPMG">
-                                                <content>
-                                                    <ScrollPane prefHeight="200.0" prefWidth="200.0" />
-                                                </content>
-                                            </Tab>
-                                        </tabs>
-                                    </TabPane>
-                                </children>
-                            </AnchorPane>
-                     </children>
-                  </GridPane>
-               </content>
-            </Tab>
-            <Tab closable="false" text="Local Data">
-               <content>
-                   <fx:include fx:id="dataTab" source="DataTab.fxml" />
-               </content>
-            </Tab>
-         </tabs>
-      </TabPane>
+        <TabPane VBox.vgrow="ALWAYS">
+            <tabs>
+                <Tab closable="false" text="Data Capture">
+                    <content>
+                        <GridPane>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES"/>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="350.0"
+                                                   prefWidth="350.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                            </rowConstraints>
+                            <children>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                    <children>
+                                        <TabPane nodeOrientation="LEFT_TO_RIGHT" side="RIGHT"
+                                                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <tabs>
+                                                <Tab closable="false" text="Data Plot">
+                                                    <content>
+                                                        <LineChart fx:id="dataChart" animated="false"
+                                                                   createSymbols="false" layoutX="70.0" layoutY="76.0"
+                                                                   title="Data Plot" AnchorPane.bottomAnchor="0.0"
+                                                                   AnchorPane.leftAnchor="0.0"
+                                                                   AnchorPane.rightAnchor="0.0"
+                                                                   AnchorPane.topAnchor="0.0">
+                                                            <xAxis>
+                                                                <NumberAxis label="Time" side="BOTTOM"/>
+                                                            </xAxis>
+                                                            <yAxis>
+                                                                <NumberAxis label="Value" side="LEFT"/>
+                                                            </yAxis>
+                                                        </LineChart>
+                                                    </content>
+                                                </Tab>
+                                                <Tab closable="false" text="FFT Plot">
+                                                    <content>
+                                                        <LineChart fx:id="fftChart" animated="false"
+                                                                   createSymbols="false" layoutX="70.0" layoutY="76.0"
+                                                                   title="Data Plot" AnchorPane.bottomAnchor="0.0"
+                                                                   AnchorPane.leftAnchor="0.0"
+                                                                   AnchorPane.rightAnchor="0.0"
+                                                                   AnchorPane.topAnchor="0.0">
+                                                            <xAxis>
+                                                                <NumberAxis label="Time" side="BOTTOM"/>
+                                                            </xAxis>
+                                                            <yAxis>
+                                                                <NumberAxis label="Value" side="LEFT"/>
+                                                            </yAxis>
+                                                        </LineChart>
+                                                    </content>
+                                                </Tab>
+                                            </tabs>
+                                        </TabPane>
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                    <children>
+                                        <TabPane side="RIGHT" tabClosingPolicy="UNAVAILABLE"
+                                                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <tabs>
+                                                <Tab text="Hahn Echo">
+                                                    <content>
+                                                        <ScrollPane fitToHeight="true" fitToWidth="true"
+                                                                    prefHeight="200.0" prefWidth="200.0">
+                                                            <content>
+                                                                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                                                    <children>
+                                                                        <VBox AnchorPane.bottomAnchor="0.0"
+                                                                              AnchorPane.leftAnchor="0.0"
+                                                                              AnchorPane.rightAnchor="0.0"
+                                                                              AnchorPane.topAnchor="0.0">
+                                                                            <children>
+                                                                                <AnchorPane fx:id="hahnContainer"/>
+                                                                                <GridPane>
+                                                                                    <columnConstraints>
+                                                                                        <ColumnConstraints
+                                                                                                hgrow="SOMETIMES"
+                                                                                                minWidth="10.0"
+                                                                                                prefWidth="100.0"/>
+                                                                                        <ColumnConstraints
+                                                                                                hgrow="SOMETIMES"
+                                                                                                minWidth="10.0"
+                                                                                                prefWidth="100.0"/>
+                                                                                    </columnConstraints>
+                                                                                    <rowConstraints>
+                                                                                        <RowConstraints minHeight="10.0"
+                                                                                                        prefHeight="30.0"
+                                                                                                        vgrow="SOMETIMES"/>
+                                                                                    </rowConstraints>
+                                                                                    <children>
+                                                                                        <Button fx:id="startButton"
+                                                                                                mnemonicParsing="false"
+                                                                                                onAction="#handleStart"
+                                                                                                styleClass="action-button"
+                                                                                                text="Start"
+                                                                                                GridPane.halignment="CENTER"/>
+                                                                                        <Button fx:id="stopButton"
+                                                                                                mnemonicParsing="false"
+                                                                                                onAction="#handleStop"
+                                                                                                styleClass="action-button"
+                                                                                                text="Stop"
+                                                                                                GridPane.columnIndex="1"
+                                                                                                GridPane.halignment="CENTER"/>
+                                                                                    </children>
+                                                                                </GridPane>
+                                                                            </children>
+                                                                        </VBox>
+                                                                    </children>
+                                                                </AnchorPane>
+                                                            </content>
+                                                        </ScrollPane>
+                                                    </content>
+                                                </Tab>
+                                                <Tab text="CPMG">
+                                                    <content>
+                                                        <ScrollPane prefHeight="200.0" prefWidth="200.0"/>
+                                                    </content>
+                                                </Tab>
+                                            </tabs>
+                                        </TabPane>
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                        </GridPane>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="Local Data">
+                    <content>
+                        <fx:include fx:id="dataTab" source="DataTab.fxml"/>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
         <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" styleClass="status-bar" VBox.vgrow="NEVER">
             <children>
-                <Label fx:id="leftStatus" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Ready" HBox.hgrow="ALWAYS">
+                <Label fx:id="leftStatus" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Ready"
+                       HBox.hgrow="ALWAYS">
                     <font>
-                        <Font size="11.0" fx:id="x3" />
+                        <Font size="11.0" fx:id="x3"/>
                     </font>
                     <textFill>
-                        <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
+                        <Color blue="0.625" green="0.625" red="0.625" fx:id="x4"/>
                     </textFill>
                 </Label>
-                <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-                <Label fx:id="rightStatus" font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4" HBox.hgrow="NEVER" />
+                <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="rightStatus" font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4"
+                       HBox.hgrow="NEVER"/>
             </children>
             <padding>
-                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
             </padding>
         </HBox>
     </children>
