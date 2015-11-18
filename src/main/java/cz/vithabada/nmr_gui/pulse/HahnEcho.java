@@ -1,5 +1,6 @@
 package cz.vithabada.nmr_gui.pulse;
 
+import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import org.apache.commons.math3.complex.Complex;
 import spinapi.SpinAPI;
 
@@ -11,28 +12,31 @@ public class HahnEcho extends Pulse<Complex[]> {
 
     boolean running = false;
 
-    public HahnEcho() {
+    HahnEchoParameters parameters;
+
+    public HahnEcho(HahnEchoParameters hahnEchoParameters) {
         this.api = SpinAPI.INSTANCE;
+        this.parameters = hahnEchoParameters;
     }
 
     @Override
     public void start() {
         running = true;
 
-        double ADC_FREQUENCY = 75.0;
-        double SPECTROMETER_FREQUENCY = 2;
-        int SPECTRAL_WIDTH = 642;
-        int NUMBER_OF_SCANS = 100;
-        double ECHO_TIME = 300;
-        double TAU = 200;
-        int P1_PHASE = 0;
-        int P2_PHASE = 0;
-        int P1_TIME = 5;
-        int P2_TIME = 10;
-        int BLANKING_BIT = 2;
-        double BLANKING_DELAY = 0.002;
-        float AMPLITUDE = 0.3f;
-        double REPETITION_DELAY = 0.1;
+        double ADC_FREQUENCY = parameters.getAdcFrequency();
+        double SPECTROMETER_FREQUENCY = parameters.getSpectrometerFrequency();
+        int SPECTRAL_WIDTH = parameters.getSpectralWidth();
+        int NUMBER_OF_SCANS = parameters.getNumberOfScans();
+        double ECHO_TIME = parameters.getEchoTime();
+        double TAU = parameters.getTau();
+        int P1_PHASE = parameters.getP1Phase();
+        int P2_PHASE = parameters.getP2Phase();
+        int P1_TIME = parameters.getP1Time();
+        int P2_TIME = parameters.getP2Time();
+        int BLANKING_BIT = parameters.getBlankingBit();
+        double BLANKING_DELAY = parameters.getBlankingDelay();
+        float AMPLITUDE = parameters.getAmplitude();
+        double REPETITION_DELAY = parameters.getRepetitionDelay();
 
         System.out.println("SpinAPI version: " + api.pb_get_version());
         if (api.pb_count_boards() <= 0) {

@@ -143,7 +143,7 @@ public class MainController implements Initializable {
     Pulse<Complex[]> createPulse() {
         // TODO instantiate pulse wrapper based on currently selected tab and initialize its events
 
-        return new HahnEcho();
+        return new HahnEcho(hahnEchoParameters);
     }
 
     void checkBoard() {
