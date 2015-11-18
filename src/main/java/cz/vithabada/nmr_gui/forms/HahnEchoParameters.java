@@ -3,11 +3,9 @@ package cz.vithabada.nmr_gui.forms;
 import javafx.beans.property.*;
 
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 public class HahnEchoParameters extends Parameters {
-
-    // TODO names of properties eg. adcFrequency -> ADC Frequency (MHz)
-    // TODO pulse parameters constraints
 
     DoubleProperty adcFrequency = new SimpleDoubleProperty(75);
     DoubleProperty spectrometerFrequency = new SimpleDoubleProperty(2);
@@ -24,7 +22,8 @@ public class HahnEchoParameters extends Parameters {
     FloatProperty amplitude = new SimpleFloatProperty(0.3f);
     DoubleProperty repetitionDelay = new SimpleDoubleProperty(0.1);
 
-    @Max(value = 10)
+    @Min(value = 0)
+    @Max(value = 100)
     public double getAdcFrequency() {
         return adcFrequency.get();
     }
@@ -49,6 +48,7 @@ public class HahnEchoParameters extends Parameters {
         this.spectrometerFrequency.set(spectrometerFrequency);
     }
 
+    @Max(value = 10000)
     public int getSpectralWidth() {
         return spectralWidth.get();
     }
@@ -61,6 +61,7 @@ public class HahnEchoParameters extends Parameters {
         this.spectralWidth.set(spectralWidth);
     }
 
+    @Min(value = 1)
     public int getNumberOfScans() {
         return numberOfScans.get();
     }
