@@ -80,7 +80,7 @@
                                                         </LineChart>
                                                     </content>
                                                 </Tab>
-                                                <Tab closable="false" text="Modul Plot">
+                                                <Tab closable="false" text="Modulus Plot">
                                                     <content>
                                                         <LineChart fx:id="modulChart" animated="false"
                                                                    createSymbols="false" layoutX="70.0" layoutY="76.0"
