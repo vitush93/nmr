@@ -48,6 +48,8 @@ public class PTSController implements Initializable {
 
             if (SpinAPI.INSTANCE.set_pts(maxFreq, is160, is3200, allowPhase, noPTS, freq, 0) != 0) {
                 label.setText(SpinAPI.INSTANCE.spinpts_get_error());
+            } else {
+                label.setText("Frequency set");
             }
         } catch (NumberFormatException e) {
             label.setText("Invalid number format.");
