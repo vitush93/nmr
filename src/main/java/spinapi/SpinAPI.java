@@ -32,6 +32,8 @@ public interface SpinAPI extends Library {
 
     String pb_get_error();
 
+    String spinpts_get_error();
+
     int pb_count_boards();
 
     int pb_set_defaults();
@@ -59,18 +61,18 @@ public interface SpinAPI extends Library {
     int pb_set_amp(float amp, int addr);
 
     int pb_inst_radio_shape(int freq,
-            int cos_phase,
-            int sin_phase,
-            int tx_phase,
-            int tx_enable,
-            int phase_reset,
-            int trigger_scan,
-            int use_shape,
-            int amp,
-            int flags,
-            int inst,
-            int inst_data,
-            double length);
+                            int cos_phase,
+                            int sin_phase,
+                            int tx_phase,
+                            int tx_enable,
+                            int phase_reset,
+                            int trigger_scan,
+                            int use_shape,
+                            int amp,
+                            int flags,
+                            int inst,
+                            int inst_data,
+                            double length);
 
     int pb_reset();
 
@@ -83,8 +85,16 @@ public interface SpinAPI extends Library {
     void pb_sleep_ms(int miliseconds);
 
     int pb_get_data(int num_points, int[] real_data, int[] imag_data);
-    
+
     void pb_set_debug(int debug);
-    
+
     int pb_init();
+
+    int set_pts(double maxFreq,
+                int is160,
+                int is3200,
+                int allowPhase,
+                int noPTS,
+                double frequency,
+                int phase);
 }

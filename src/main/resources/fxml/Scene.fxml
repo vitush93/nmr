@@ -21,7 +21,7 @@
                 <Menu mnemonicParsing="false" text="Devices">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleOpenAttenuatorWindow" text="Attenuator"/>
-                        <MenuItem mnemonicParsing="false" text="USB-PTS"/>
+                        <MenuItem mnemonicParsing="false" text="USB-PTS" onAction="#handleOpenPTSWindow"/>
                     </items>
                 </Menu>
             </menus>
