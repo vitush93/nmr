@@ -80,6 +80,23 @@
                                                         </LineChart>
                                                     </content>
                                                 </Tab>
+                                                <Tab closable="false" text="Modul Plot">
+                                                    <content>
+                                                        <LineChart fx:id="modulChart" animated="false"
+                                                                   createSymbols="false" layoutX="70.0" layoutY="76.0"
+                                                                   title="Data Plot" AnchorPane.bottomAnchor="0.0"
+                                                                   AnchorPane.leftAnchor="0.0"
+                                                                   AnchorPane.rightAnchor="0.0"
+                                                                   AnchorPane.topAnchor="0.0">
+                                                            <xAxis>
+                                                                <NumberAxis label="Time" side="BOTTOM"/>
+                                                            </xAxis>
+                                                            <yAxis>
+                                                                <NumberAxis label="Value" side="LEFT"/>
+                                                            </yAxis>
+                                                        </LineChart>
+                                                    </content>
+                                                </Tab>
                                             </tabs>
                                         </TabPane>
                                     </children>

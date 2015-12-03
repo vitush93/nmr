@@ -60,6 +60,9 @@ public class MainController implements Initializable {
     LineChart<Number, Number> fftChart;
 
     @FXML
+    LineChart<Number, Number> modulChart;
+
+    @FXML
     Button startButton;
 
     @FXML
@@ -299,6 +302,10 @@ public class MainController implements Initializable {
 
             Complex[] transformed = FFT.transform(value);
             fftChartUpdate.invoke(sender, transformed);
+
+            Invokable<Complex[]> modulChartUpdate = createChartUpdateEvent(modulChart);
+            Complex[] modul = FFT.modul(value);
+            modulChartUpdate.invoke(sender, modul);
         };
     }
 

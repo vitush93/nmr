@@ -17,6 +17,26 @@ public class FFT {
         return fft.transform(data, TransformType.FORWARD);
     }
 
+    public static Complex[] modul(Complex[] data) {
+        if ((data.length & (data.length - 1)) != 0) {
+            data = pad(data);
+        }
+
+        FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
+        Complex[] transformed = fft.transform(data, TransformType.FORWARD);
+
+        Complex[] arr = new Complex[data.length];
+
+        for (int i = 0; i < data.length; i++) {
+            double re = transformed[i].getReal();
+            double im = transformed[i].getImaginary();
+
+            arr[i] = new Complex(Math.sqrt(re*re + im*im));
+        }
+
+        return arr;
+    }
+
     private static Complex[] pad(Complex[] data) {
         int padLength = padLength(data.length);
 
