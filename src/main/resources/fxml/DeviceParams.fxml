@@ -21,34 +21,34 @@
     </rowConstraints>
     <children>
       <Label text="PTS Freq (MHz)" GridPane.rowIndex="1" />
-      <TextField text="47.46" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <TextField text="47.46" GridPane.columnIndex="1" fx:id="ptsTextField" GridPane.rowIndex="1">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
-      <Label text="USB Attenuator" GridPane.rowIndex="2" />
-      <TextField text="30" GridPane.columnIndex="1" GridPane.rowIndex="2">
+      <Label text="Amplifier Gain (dB)" GridPane.rowIndex="2" />
+      <TextField text="30" GridPane.columnIndex="1" GridPane.rowIndex="2" fx:id="attTextField">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
       <Label text="Receiver Gain (dB)" GridPane.rowIndex="3" />
       <Label text="Receiver BW (MHz)" GridPane.rowIndex="4" />
-      <TextField text="25" GridPane.columnIndex="1" GridPane.rowIndex="3">
+      <TextField text="25" GridPane.columnIndex="1" GridPane.rowIndex="3" fx:id="gainTextField">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
-      <TextField text="0.1" GridPane.columnIndex="1" GridPane.rowIndex="4">
+      <TextField text="0.1" GridPane.columnIndex="1" GridPane.rowIndex="4" fx:id="bwTextField">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
-      <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <Button mnemonicParsing="false" text="Set" fx:id="ptsButton" onAction="#setPts" GridPane.columnIndex="2" GridPane.rowIndex="1" />
       <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="2" />
       <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="3" />
       <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-      <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <Label text="Ready" fx:id="ptsLabel" GridPane.columnIndex="3" GridPane.rowIndex="1" />
       <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="2" />
       <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="3" />
       <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="4" />
