@@ -13,8 +13,8 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setMinWidth(1100);
-        stage.setMinHeight(650);
+        stage.setMinWidth(1300);
+        stage.setMinHeight(850);
 
         // check if SpinAPI is installed
         try {

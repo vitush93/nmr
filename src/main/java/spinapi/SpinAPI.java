@@ -74,6 +74,23 @@ public interface SpinAPI extends Library {
                             int inst_data,
                             double length);
 
+    int pb_inst_radio_shape_cyclops(int freq,
+                            int cos_phase,
+                            int sin_phase,
+                            int tx_phase,
+                            int tx_enable,
+                            int phase_reset,
+                            int trigger_scan,
+                            int use_shape,
+                            int amp,
+                            int real_add_sub,
+                            int imag_add_sub,
+                            int channel_swap,
+                            int flags,
+                            int inst,
+                            int inst_data,
+                            double length);
+
     int pb_reset();
 
     int pb_stop();

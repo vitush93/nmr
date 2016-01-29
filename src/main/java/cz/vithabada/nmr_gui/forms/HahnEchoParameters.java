@@ -21,6 +21,19 @@ public class HahnEchoParameters extends Parameters {
     DoubleProperty blankingDelay = new SimpleDoubleProperty(0.002);
     FloatProperty amplitude = new SimpleFloatProperty(0.3f);
     DoubleProperty repetitionDelay = new SimpleDoubleProperty(0.1);
+    BooleanProperty cyclops = new SimpleBooleanProperty(false);
+
+    public boolean getCyclops() {
+        return cyclops.get();
+    }
+
+    public BooleanProperty cyclopsProperty() {
+        return cyclops;
+    }
+
+    public void setCyclops(boolean cyclops) {
+        this.cyclops.set(cyclops);
+    }
 
     @Min(value = 0)
     @Max(value = 100)

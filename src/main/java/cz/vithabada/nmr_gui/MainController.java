@@ -4,6 +4,7 @@ import com.dooapp.fxform.FXForm;
 import cz.vithabada.nmr_gui.forms.FormFactory;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.pulse.HahnEcho;
+import cz.vithabada.nmr_gui.pulse.HahnEchoCYCLOPS;
 import cz.vithabada.nmr_gui.pulse.Pulse;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -45,6 +46,9 @@ import java.util.Set;
 public class MainController implements Initializable {
 
     @FXML
+    GridPane deviceParams;
+
+    @FXML
     AnchorPane hahnContainer;
 
     @FXML
@@ -52,6 +56,9 @@ public class MainController implements Initializable {
 
     @FXML
     DataTabController dataTabController;
+
+    @FXML
+    DeviceParamsController deviceParamsController;
 
     @FXML
     LineChart<Number, Number> dataChart;
@@ -180,7 +187,11 @@ public class MainController implements Initializable {
     Pulse<Complex[]> createPulse() {
         // TODO instantiate pulse wrapper based on currently selected tab and initialize its events
 
-        return new HahnEcho(hahnEchoParameters);
+        if (hahnEchoParameters.getCyclops()) {
+            return new HahnEchoCYCLOPS(hahnEchoParameters);
+        } else {
+            return new HahnEcho(hahnEchoParameters);
+        }
     }
 
     void checkBoard() {
