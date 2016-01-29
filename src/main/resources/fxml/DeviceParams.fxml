@@ -7,8 +7,10 @@
 
 <GridPane maxHeight="Infinity" maxWidth="Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.DeviceParamsController">
     <columnConstraints>
-        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" percentWidth="35" />
+        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" percentWidth="25" />
+      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" percentWidth="12.5" />
+      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" percentWidth="27.5" />
     </columnConstraints>
     <rowConstraints>
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -19,28 +21,36 @@
     </rowConstraints>
     <children>
       <Label text="PTS Freq (MHz)" GridPane.rowIndex="1" />
-      <TextField GridPane.columnIndex="1" text="47.46" GridPane.rowIndex="1">
+      <TextField text="47.46" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <GridPane.margin>
-            <Insets left="20.0" right="70.0" />
+            <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
       <Label text="USB Attenuator" GridPane.rowIndex="2" />
       <TextField text="30" GridPane.columnIndex="1" GridPane.rowIndex="2">
          <GridPane.margin>
-            <Insets left="20.0" right="70.0" />
+            <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
       <Label text="Receiver Gain (dB)" GridPane.rowIndex="3" />
       <Label text="Receiver BW (MHz)" GridPane.rowIndex="4" />
       <TextField text="25" GridPane.columnIndex="1" GridPane.rowIndex="3">
          <GridPane.margin>
-            <Insets left="20.0" right="70.0" />
+            <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
       <TextField text="0.1" GridPane.columnIndex="1" GridPane.rowIndex="4">
          <GridPane.margin>
-            <Insets left="20.0" right="70.0" />
+            <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
+      <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+      <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+      <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+      <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+      <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+      <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="4" />
     </children>
 </GridPane>
