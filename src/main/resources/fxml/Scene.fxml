@@ -24,6 +24,11 @@
                         <MenuItem mnemonicParsing="false" text="USB-PTS" onAction="#handleOpenPTSWindow"/>
                     </items>
                 </Menu>
+                <Menu mnemonicParsing="false" disable="true" text="Data" fx:id="dataMenu">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#handleSaveData" text="Save as plaintext"/>
+                    </items>
+                </Menu>
             </menus>
         </MenuBar>
         <TabPane VBox.vgrow="ALWAYS">

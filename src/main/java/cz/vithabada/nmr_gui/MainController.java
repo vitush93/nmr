@@ -18,18 +18,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import libs.AlertHelper;
 import libs.FFT;
 import libs.Invokable;
+import model.PlainTextData;
 import org.apache.commons.math3.complex.Complex;
 import spinapi.SpinAPI;
 
@@ -37,6 +36,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -70,6 +70,9 @@ public class MainController implements Initializable {
 
     @FXML
     MenuBar menuBar;
+
+    @FXML
+    Menu dataMenu;
 
     @FXML
     Label leftStatus;
@@ -143,6 +146,37 @@ public class MainController implements Initializable {
         setRunningState();
     }
 
+    @FXML
+    void handleSaveData() {
+        if (pulse == null || pulse.getData() == null) {
+            AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Nothing to save", "Start data capture first.");
+
+            return;
+        }
+
+        // display file browser dialog
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save as");
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            if (file.exists()) {
+
+                // if file exists, delete existing file
+                boolean oldDeleted = file.delete();
+                if (!oldDeleted) {
+                    AlertHelper.showAlert(Alert.AlertType.ERROR, "Could not save data", "File could not be overwritten.");
+
+                    return;
+                }
+            }
+
+            // write to file
+            PlainTextData plainTextData = new PlainTextData(pulse.getData());
+            plainTextData.toFile(file);
+        }
+    }
+
     Pulse<Complex[]> createPulse() {
         // TODO instantiate pulse wrapper based on currently selected tab and initialize its events
 
@@ -188,7 +222,7 @@ public class MainController implements Initializable {
     /**
      * Opens preconfigured modal window with current window as owner.
      *
-     * @param root loaded FXML resource
+     * @param root  loaded FXML resource
      * @param title window title
      */
     private void openModalWindow(Parent root, String title) {
@@ -343,6 +377,7 @@ public class MainController implements Initializable {
 
         startButton.setDisable(false);
         stopButton.setDisable(true);
+        dataMenu.setDisable(false);
     }
 
     /**
@@ -353,6 +388,7 @@ public class MainController implements Initializable {
 
         startButton.setDisable(true);
         stopButton.setDisable(false);
+        dataMenu.setDisable(true);
     }
 
     /**
