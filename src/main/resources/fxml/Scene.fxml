@@ -17,12 +17,6 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleQuit" text="Quit" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Devices">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleOpenAttenuatorWindow" text="Attenuator" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleOpenPTSWindow" text="USB-PTS" />
-                    </items>
-                </Menu>
                 <Menu fx:id="dataMenu" disable="true" mnemonicParsing="false" text="Data">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleSaveData" text="Save as plaintext" />
