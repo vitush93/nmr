@@ -12,10 +12,15 @@ import jssc.SerialPortList;
 import libs.AlertHelper;
 import spinapi.SpinAPI;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class DeviceParamsController implements Initializable {
+
+    @FXML
+    Label gainLabel;
 
     @FXML
     Button gainButton;
@@ -46,18 +51,43 @@ public class DeviceParamsController implements Initializable {
     @FXML
     void setGain() {
         String[] portNames = SerialPortList.getPortNames();
-        for (String s : portNames) {
-            System.out.println(s); // TODO write data to correct serial port
+
+        if (portNames.length == 0) {
+            setStatusLabel(gainLabel, DeviceStatus.FAIL);
+            AlertHelper.showAlert(Alert.AlertType.WARNING, "No serial port detected", "No serial ports detected on this system.");
+
+            return;
         }
 
-        SerialPort serialPort = new SerialPort("COM1");
-        try {
-            serialPort.openPort();
-            String data = serialPort.readString();
-            System.out.println(data);
-        } catch (SerialPortException e) {
-            e.printStackTrace();
+        boolean set = false;
+
+        // send gain data to serial ports
+        for (String port : portNames) {
+            SerialPort serialPort = new SerialPort(port);
+
+            try {
+                serialPort.openPort();
+
+                // TODO send data to serial port
+                set = true;
+            } catch (SerialPortException e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+
+                AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", sw.toString());
+            }
         }
+
+        if (set) {
+            setStatusLabel(gainLabel, DeviceStatus.OK);
+        } else {
+            setStatusLabel(gainLabel, DeviceStatus.FAIL);
+        }
+    }
+
+    void setStatusLabel(Label label, DeviceStatus deviceStatus) {
+        label.setText(deviceStatus.toString());
     }
 
     @FXML
@@ -72,13 +102,19 @@ public class DeviceParamsController implements Initializable {
             double freq = Double.parseDouble(ptsTextField.getText());
 
             if (SpinAPI.INSTANCE.set_pts(maxFreq, is160, is3200, allowPhase, noPTS, freq, 0) != 0) {
-                ptsLabel.setText("Fail");
+                setStatusLabel(ptsLabel, DeviceStatus.FAIL);
                 AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", SpinAPI.INSTANCE.spinpts_get_error());
             } else {
-                ptsLabel.setText("OK");
+                setStatusLabel(ptsLabel, DeviceStatus.OK);
             }
         } catch (NumberFormatException e) {
             AlertHelper.showAlert(Alert.AlertType.WARNING, "Invalid input", "Please enter a valid number.");
         }
     }
+}
+
+enum DeviceStatus {
+    OK,
+    FAIL,
+    Ready
 }
