@@ -2,18 +2,14 @@ package cz.vithabada.nmr_gui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import libs.AlertHelper;
 import spinapi.SpinAPI;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -32,7 +28,10 @@ public class DeviceParamsController implements Initializable {
     Button ptsButton;
 
     @FXML
-    TextField bwTextField;
+    CheckBox bwCheckbox;
+
+    @FXML
+    CheckBox db40Checkbox;
 
     @FXML
     TextField gainTextField;
@@ -43,40 +42,98 @@ public class DeviceParamsController implements Initializable {
     @FXML
     TextField ptsTextField;
 
+    SerialPort serialPort;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        // disable serial port settings if no serial port is present
+        String[] ports = SerialPortList.getPortNames();
+        if (ports.length == 0) {
+            gainButton.setDisable(true);
+            bwCheckbox.setDisable(true);
+            db40Checkbox.setDisable(true);
+            gainTextField.setDisable(true);
+        } else {
+            serialPort = new SerialPort("COM2"); // FIXME assumes COM2
+
+            try {
+                serialPort.openPort();
+                serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            } catch (SerialPortException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    void one() throws SerialPortException {
+        serialPort.writeByte((byte) 0);
+        spin();
+        serialPort.setDTR(true);
+        spin();
+        serialPort.setDTR(false);
+        spin();
+    }
+
+    void zero() throws SerialPortException {
+        serialPort.setDTR(true);
+        spin();
+        serialPort.setDTR(false);
+        spin();
+    }
+
+    void spin() {
+        for (int i = 0; i < 1000000; i++) {
+        }
+    }
+
+    byte createMask(boolean bw, boolean db40, byte gain) {
+        byte mask = gain;
+
+        if (bw) {
+            mask |= (1 << 7);
+        }
+
+        if (db40) {
+            mask |= (1 << 6);
+        }
+
+        return mask;
     }
 
     @FXML
-    void setGain() {
-        String[] portNames = SerialPortList.getPortNames();
+    void setGain() throws SerialPortException {
+        boolean set = false;
 
-        if (portNames.length == 0) {
-            setStatusLabel(gainLabel, DeviceStatus.FAIL);
-            AlertHelper.showAlert(Alert.AlertType.WARNING, "No serial port detected", "No serial ports detected on this system.");
+        byte gain = 0;
+        try {
+            gain = Byte.parseByte(gainTextField.getText());
+
+            if (gain < 0 || gain > 63) {
+                AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid input", "Gain value must be between 0 and 63");
+
+                return;
+            }
+        } catch (NumberFormatException e) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid input", "Gain (dB): Please enter a valid number.");
 
             return;
         }
 
-        boolean set = false;
+        try {
+            byte mask = createMask(bwCheckbox.isSelected(), db40Checkbox.isSelected(), gain);
 
-        // send gain data to serial ports
-        for (String port : portNames) {
-            SerialPort serialPort = new SerialPort(port);
-
-            try {
-                serialPort.openPort();
-
-                // TODO send data to serial port
-                set = true;
-            } catch (SerialPortException e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-
-                AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", sw.toString());
+            for (int i = 7; i >= 0; i--) {
+                if (((1 << i) & mask) != 0) {
+                    one();
+                } else {
+                    zero();
+                }
             }
+
+            set = true;
+        } catch (SerialPortException e) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
 
         if (set) {

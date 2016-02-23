@@ -14,43 +14,46 @@
     </columnConstraints>
     <rowConstraints>
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
     </rowConstraints>
     <children>
       <Label text="PTS Freq (MHz)" GridPane.rowIndex="1" />
-      <TextField text="47.46" GridPane.columnIndex="1" fx:id="ptsTextField" GridPane.rowIndex="1">
+      <TextField fx:id="ptsTextField" text="47.46" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
       <Label text="Amplifier Gain (dB)" GridPane.rowIndex="2" />
-      <TextField text="30" GridPane.columnIndex="1" GridPane.rowIndex="2" fx:id="attTextField">
+      <TextField fx:id="attTextField" text="30" GridPane.columnIndex="1" GridPane.rowIndex="2">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
       <Label text="Receiver Gain (dB)" GridPane.rowIndex="3" />
-      <Label text="Receiver BW (MHz)" GridPane.rowIndex="4" />
-      <TextField text="25" GridPane.columnIndex="1" GridPane.rowIndex="3" fx:id="gainTextField">
+      <TextField fx:id="gainTextField" text="25" GridPane.columnIndex="1" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>
       </TextField>
-      <TextField text="0.1" GridPane.columnIndex="1" GridPane.rowIndex="4" fx:id="bwTextField">
-         <GridPane.margin>
-            <Insets left="20.0" right="20.0" />
-         </GridPane.margin>
-      </TextField>
-      <Button mnemonicParsing="false" text="Set" fx:id="ptsButton" onAction="#setPts" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <Button fx:id="ptsButton" mnemonicParsing="false" onAction="#setPts" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="1" />
       <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-      <Button mnemonicParsing="false" text="Set" fx:id="gainButton" onAction="#setGain" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-      <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-      <Label text="Ready" fx:id="ptsLabel" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <Button fx:id="gainButton" mnemonicParsing="false" onAction="#setGain" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+      <Label fx:id="ptsLabel" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="1" />
       <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-      <Label text="Ready" fx:id="gainLabel" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-      <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+      <Label fx:id="gainLabel" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+      <CheckBox fx:id="bwCheckbox" mnemonicParsing="false" text="0.1MHz" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </CheckBox>
+      <CheckBox fx:id="db40Checkbox" mnemonicParsing="false" text="-40dB" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </CheckBox>
     </children>
 </GridPane>
