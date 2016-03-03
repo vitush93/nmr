@@ -1,5 +1,6 @@
 package cz.vithabada.nmr_gui;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -7,6 +8,7 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import libs.AlertHelper;
+import spinapi.FTDI_Device;
 import spinapi.SpinAPI;
 
 import java.io.*;
@@ -35,6 +37,12 @@ public class DeviceParamsController implements Initializable {
 
     @FXML
     TextField gainTextField;
+
+    @FXML
+    Label attLabel;
+
+    @FXML
+    Button attGain;
 
     @FXML
     TextField attTextField;
@@ -163,6 +171,28 @@ public class DeviceParamsController implements Initializable {
                 AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", SpinAPI.INSTANCE.spinpts_get_error());
             } else {
                 setStatusLabel(ptsLabel, DeviceStatus.OK);
+            }
+        } catch (NumberFormatException e) {
+            AlertHelper.showAlert(Alert.AlertType.WARNING, "Invalid input", "Please enter a valid number.");
+        }
+    }
+
+    @FXML
+    void setAttenuation(ActionEvent actionEvent) {
+        try {
+            int attenuation = Integer.parseInt(attTextField.getText());
+            if (attenuation < 0 || attenuation > 31) {
+                AlertHelper.showAlert(Alert.AlertType.WARNING, "Invalid input", "Attenuation must be between 0 and 31.");
+
+                return;
+            }
+
+            String deviceMessage = FTDI_Device.INSTANCE.device_set_attenuation(attenuation);
+
+            if (!deviceMessage.equals("all fine")) {
+                setStatusLabel(attLabel, DeviceStatus.FAIL);
+            } else {
+                setStatusLabel(attLabel, DeviceStatus.OK);
             }
         } catch (NumberFormatException e) {
             AlertHelper.showAlert(Alert.AlertType.WARNING, "Invalid input", "Please enter a valid number.");

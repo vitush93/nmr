@@ -40,10 +40,10 @@
          </GridPane.margin>
       </TextField>
       <Button fx:id="ptsButton" mnemonicParsing="false" onAction="#setPts" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <Button mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+      <Button fx:id="attGain" onAction="#setAttenuation" mnemonicParsing="false" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="2" />
       <Button fx:id="gainButton" mnemonicParsing="false" onAction="#setGain" text="Set" GridPane.columnIndex="2" GridPane.rowIndex="3" />
       <Label fx:id="ptsLabel" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-      <Label text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+      <Label fx:id="attLabel" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="2" />
       <Label fx:id="gainLabel" text="Ready" GridPane.columnIndex="3" GridPane.rowIndex="3" />
       <CheckBox fx:id="bwCheckbox" mnemonicParsing="false" text="0.1MHz" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="4">
          <GridPane.margin>
