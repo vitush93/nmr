@@ -2,7 +2,7 @@ package cz.vithabada.nmr_gui.pulse;
 
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import org.apache.commons.math3.complex.Complex;
-import spinapi.SpinAPI;
+import api.SpinAPI;
 
 public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
 

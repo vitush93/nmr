@@ -31,7 +31,7 @@ import libs.FFT;
 import libs.Invokable;
 import model.PlainTextData;
 import org.apache.commons.math3.complex.Complex;
-import spinapi.SpinAPI;
+import api.SpinAPI;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

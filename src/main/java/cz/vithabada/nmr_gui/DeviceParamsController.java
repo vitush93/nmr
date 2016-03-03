@@ -4,14 +4,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import libs.AlertHelper;
-import spinapi.FTDI_Device;
-import spinapi.SpinAPI;
+import libs.RS232_Attenuator;
+import libs.RS232_AttenuatorException;
+import api.FTDI_Device;
+import api.SpinAPI;
 
-import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -50,7 +50,7 @@ public class DeviceParamsController implements Initializable {
     @FXML
     TextField ptsTextField;
 
-    SerialPort serialPort;
+    RS232_Attenuator rs232Attenuator;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -63,91 +63,24 @@ public class DeviceParamsController implements Initializable {
             db40Checkbox.setDisable(true);
             gainTextField.setDisable(true);
         } else {
-            serialPort = new SerialPort("COM2"); // FIXME assumes COM2
-
-            try {
-                serialPort.openPort();
-                serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-            } catch (SerialPortException e) {
-                e.printStackTrace();
-            }
+            rs232Attenuator = new RS232_Attenuator("COM2");
         }
-    }
-
-    void one() throws SerialPortException {
-        serialPort.writeByte((byte) 0);
-        spin();
-        serialPort.setDTR(true);
-        spin();
-        serialPort.setDTR(false);
-        spin();
-    }
-
-    void zero() throws SerialPortException {
-        serialPort.setDTR(true);
-        spin();
-        serialPort.setDTR(false);
-        spin();
-    }
-
-    void spin() {
-        for (int i = 0; i < 1000000; i++) {
-        }
-    }
-
-    byte createMask(boolean bw, boolean db40, byte gain) {
-        byte mask = gain;
-
-        if (bw) {
-            mask |= (1 << 7);
-        }
-
-        if (db40) {
-            mask |= (1 << 6);
-        }
-
-        return mask;
     }
 
     @FXML
     void setGain() throws SerialPortException {
-        boolean set = false;
-
-        byte gain = 0;
         try {
-            gain = Byte.parseByte(gainTextField.getText());
+            byte gain = Byte.parseByte(gainTextField.getText());
 
-            if (gain < 0 || gain > 63) {
-                AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid input", "Gain value must be between 0 and 63");
+            rs232Attenuator.setGain(gain, bwCheckbox.isSelected(), db40Checkbox.isSelected());
 
-                return;
-            }
+            setStatusLabel(gainLabel, DeviceStatus.OK);
         } catch (NumberFormatException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid input", "Gain (dB): Please enter a valid number.");
-
-            return;
-        }
-
-        try {
-            byte mask = createMask(bwCheckbox.isSelected(), db40Checkbox.isSelected(), gain);
-
-            for (int i = 7; i >= 0; i--) {
-                if (((1 << i) & mask) != 0) {
-                    one();
-                } else {
-                    zero();
-                }
-            }
-
-            set = true;
+        } catch (RS232_AttenuatorException e) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid input", e.getMessage());
         } catch (SerialPortException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
-        }
-
-        if (set) {
-            setStatusLabel(gainLabel, DeviceStatus.OK);
-        } else {
-            setStatusLabel(gainLabel, DeviceStatus.FAIL);
         }
     }
 
