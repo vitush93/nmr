@@ -38,6 +38,9 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         float AMPLITUDE = parameters.getAmplitude();
         double REPETITION_DELAY = parameters.getRepetitionDelay();
 
+        NUMBER_OF_SCANS = (NUMBER_OF_SCANS + 3) & ~0x3;
+        if (NUMBER_OF_SCANS == 0) NUMBER_OF_SCANS = 4;
+
         System.out.println("SpinAPI version: " + api.pb_get_version());
         if (api.pb_count_boards() <= 0) {
             System.out.println("Board not connected!");
@@ -117,7 +120,7 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         int NOSWAP = 0;
 
         // CYCLOPS SCAN #0 BEGIN
-        int scan_loop_label = api.pb_inst_radio_shape_cyclops(0, SpinAPI.PHASE090, SpinAPI.PHASE000, SpinAPI.PHASE000, SpinAPI.TX_DISABLE, SpinAPI.PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, ADD, ADD, NOSWAP, (1 << BLANKING_BIT), SpinAPI.LOOP, NUMBER_OF_SCANS/4, BLANKING_DELAY * 1000000.0);
+        int scan_loop_label = api.pb_inst_radio_shape_cyclops(0, SpinAPI.PHASE090, SpinAPI.PHASE000, SpinAPI.PHASE000, SpinAPI.TX_DISABLE, SpinAPI.PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, ADD, ADD, NOSWAP, (1 << BLANKING_BIT), SpinAPI.LOOP, NUMBER_OF_SCANS / 4, BLANKING_DELAY * 1000000.0);
 
         // 1st (90 degree) pulse
         api.pb_inst_radio_shape_cyclops(0, SpinAPI.PHASE090, SpinAPI.PHASE000, SpinAPI.PHASE000, SpinAPI.TX_ENABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, ADD, ADD, NOSWAP, (1 << BLANKING_BIT), SpinAPI.CONTINUE, 0, P1_TIME * 1000.0);
@@ -146,7 +149,6 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         // Allow sample to relax before acquiring another scan
         api.pb_inst_radio_shape_cyclops(0, SpinAPI.PHASE090, SpinAPI.PHASE000, SpinAPI.PHASE000, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, ADD, ADD, NOSWAP, 0x00, SpinAPI.CONTINUE, 0, REPETITION_DELAY * 1000.0 * 1000000.0);
         // CYCLOPS SCAN #0 END
-
 
 
         // CYCLOPS SCAN #1 BEGIN
@@ -181,7 +183,6 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         // CYCLOPS SCAN #1 END
 
 
-
         // CYCLOPS SCAN #2 BEGIN
         api.pb_inst_radio_shape_cyclops(0, SpinAPI.PHASE090, SpinAPI.PHASE000, SpinAPI.PHASE180, SpinAPI.TX_DISABLE, SpinAPI.PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, SUB, SUB, NOSWAP, (1 << BLANKING_BIT), SpinAPI.CONTINUE, 0, BLANKING_DELAY * 1000000.0);
 
@@ -214,7 +215,6 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         // CYCLOPS SCAN #2 END
 
 
-
         // CYCLOPS SCAN #3 BEGIN
         api.pb_inst_radio_shape_cyclops(0, SpinAPI.PHASE090, SpinAPI.PHASE000, SpinAPI.PHASE270, SpinAPI.TX_DISABLE, SpinAPI.PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, SUB, ADD, SWAP, (1 << BLANKING_BIT), SpinAPI.CONTINUE, 0, BLANKING_DELAY * 1000000.0);
 
@@ -245,7 +245,6 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         // Allow sample to relax before acquiring another scan
         api.pb_inst_radio_shape_cyclops(0, SpinAPI.PHASE090, SpinAPI.PHASE000, SpinAPI.PHASE270, SpinAPI.TX_DISABLE, SpinAPI.NO_PHASE_RESET, SpinAPI.NO_TRIGGER, 0, 0, SUB, ADD, SWAP, 0x00, SpinAPI.CONTINUE, 0, REPETITION_DELAY * 1000.0 * 1000000.0);
         // CYCLOPS SCAN #3 END
-
 
 
         // ---------------------------- STOP THE EXECUTION
