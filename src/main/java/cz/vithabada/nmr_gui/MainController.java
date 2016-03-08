@@ -73,6 +73,9 @@ public class MainController implements Initializable {
     Button startButton;
 
     @FXML
+    Button contButton;
+
+    @FXML
     Button stopButton;
 
     @FXML
@@ -151,6 +154,24 @@ public class MainController implements Initializable {
 
         // update UI to running state
         setRunningState();
+    }
+
+    @FXML
+    void handleContButton(ActionEvent actionEvent) {
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ContWindow.fxml"));
+            root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Start a continuous scan");
+            Scene scene = new Scene(root, 500, 140);
+            stage.setScene(scene);
+
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
