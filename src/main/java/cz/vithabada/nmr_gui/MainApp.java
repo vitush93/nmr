@@ -18,7 +18,7 @@ public class MainApp extends Application {
 
         // check if SpinAPI is installed
         try {
-            System.loadLibrary((System.getProperty("sun.arch.data.model").contains("64")) ? "spinapi64" : "api");
+            System.loadLibrary((System.getProperty("sun.arch.data.model").contains("64")) ? "spinapi64" : "spinapi");
         } catch (Error error) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Missing SpinAPI", "It seems that SpinAPI is not installed on this computer. Please install SpinAPI first to use this software.");
 
