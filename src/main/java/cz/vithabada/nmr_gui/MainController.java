@@ -11,7 +11,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -44,6 +46,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 public class MainController implements Initializable {
+
+    public static PulseTab selectedTab = PulseTab.HAHN_ECHO;
+
+    @FXML
+    Button startCont;
+
+    @FXML
+    TabPane pulseTab;
 
     @FXML
     GridPane deviceParams;
@@ -125,11 +135,7 @@ public class MainController implements Initializable {
      */
     @FXML
     void handleStart() {
-        if (!boardConnected) { // board is not present - display alert
-            AlertHelper.showAlert(Alert.AlertType.ERROR, "No boards detected", "RadioProcessor is not connected.");
-
-            return;
-        }
+        if (!isBoardConnected()) return;
 
         // TODO refactor validation so that it can be used with other pulses
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -147,6 +153,8 @@ public class MainController implements Initializable {
 
         // start data capture task in background thread
         pulseTask = createPulseTask();
+        pulseTask.setOnSucceeded(this::pulseDone);
+        pulseTask.setOnFailed(this::pulseError);
 
         Thread t = new Thread(pulseTask);
         t.setDaemon(true);
@@ -154,6 +162,23 @@ public class MainController implements Initializable {
 
         // update UI to running state
         setRunningState();
+    }
+
+    public void handleStartCont(ActionEvent actionEvent) {
+        if (!isBoardConnected()) return;
+
+        pulse = createPulse(); // create pulse with initial parameters
+        initPulse();
+
+        pulseTask = createPulseTask();
+    }
+
+    boolean isBoardConnected() {
+        if (!boardConnected) { // board is not present - display alert
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "No boards detected", "RadioProcessor is not connected.");
+        }
+
+        return boardConnected;
     }
 
     @FXML
@@ -206,17 +231,17 @@ public class MainController implements Initializable {
     }
 
     Pulse<Complex[]> createPulse() {
-        // TODO instantiate pulse wrapper based on currently selected tab and initialize its events
-
-        if (hahnEchoParameters.getCyclops()) {
-            return new HahnEchoCYCLOPS(hahnEchoParameters);
+        if (selectedTab == PulseTab.HAHN_ECHO) {
+            if (hahnEchoParameters.getCyclops()) {
+                return new HahnEchoCYCLOPS(hahnEchoParameters);
+            } else {
+                return new HahnEcho(hahnEchoParameters);
+            }
+        } else if (selectedTab == PulseTab.CPMG) {
+            return null; // TODO CPMG
         } else {
-            return new HahnEcho(hahnEchoParameters);
+            return null;
         }
-    }
-
-    void checkBoard() {
-
     }
 
     /**
@@ -306,6 +331,13 @@ public class MainController implements Initializable {
 
         FXForm hahnForm = FormFactory.create(rb, hahnEchoParameters, "/fxml/HahnEchoForm.fxml");
         hahnContainer.getChildren().add(hahnForm);
+
+        // add pulse tab selection onChange() listener
+        pulseTab.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+
+            // on tab change update selected tab
+            selectedTab = PulseTab.values()[(int) newValue];
+        });
     }
 
     /**
@@ -325,7 +357,7 @@ public class MainController implements Initializable {
      * @return pulse task.
      */
     Task createPulseTask() {
-        Task<Void> task = new Task<Void>() {
+        return new Task<Void>() {
 
             @Override
             protected Void call() throws Exception {
@@ -334,19 +366,19 @@ public class MainController implements Initializable {
                 return null;
             }
         };
+    }
 
-        task.setOnSucceeded(event -> {
-            setReadyState();
-            AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Done", "Data capture has been successfully completed.");
-        });
+    void pulseDone(Event event) {
+        setReadyState();
 
-        task.setOnFailed(event -> {
-            setReadyState();
+        AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Done", "Data capture has been successfully completed.");
+    }
 
-            leftStatus.setText("Error has occured during program execution: " + event.getSource().getException().getMessage());
-        });
+    void pulseError(Event event) {
+        setReadyState();
 
-        return task;
+        WorkerStateEvent workerStateEvent = (WorkerStateEvent)event;
+        leftStatus.setText("Error has occured during program execution: " + workerStateEvent.getSource().getException().getMessage());
     }
 
     /**
@@ -453,5 +485,10 @@ public class MainController implements Initializable {
         this.stage = stage;
 
         this.stage.setOnCloseRequest(event -> handleQuit());
+    }
+
+    enum PulseTab {
+        HAHN_ECHO,
+        CPMG
     }
 }
