@@ -243,59 +243,6 @@ public class MainController implements Initializable {
     }
 
     /**
-     * Displays window to configure the Attenuator.
-     * If data capture is running, displays alert window
-     * and prevents user to configure the Attenuator.
-     *
-     * @param event event args
-     * @throws IOException
-     */
-    @FXML
-    void handleOpenAttenuatorWindow(ActionEvent event) throws IOException {
-        if (running) { // prevent user to setup the Attenuator if data capture is running
-            AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Warning", "Data retrieval is currently running. Stop the pulse execution first to configure the USB Attenuator.");
-
-            return;
-        }
-
-        // show Attenuator configuration window
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Attenuator.fxml"));
-
-        openModalWindow(root, "USB Attenuator");
-    }
-
-    /**
-     * Opens preconfigured modal window with current window as owner.
-     *
-     * @param root  loaded FXML resource
-     * @param title window title
-     */
-    private void openModalWindow(Parent root, String title) {
-        Stage stage = new Stage();
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.initOwner(this.stage.getScene().getWindow());
-        stage.setTitle(title);
-        stage.setScene(new Scene(root, 400, 100));
-        stage.setResizable(false);
-
-        stage.show();
-    }
-
-    @FXML
-    void handleOpenPTSWindow(ActionEvent event) throws IOException {
-        if (running) { // prevent user to setup the Attenuator if data capture is running
-            AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Warning", "Data retrieval is currently running. Stop the pulse execution first to configure the USB Attenuator.");
-
-            return;
-        }
-
-        // show USB-PTS configuration window
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/PTS.fxml"));
-
-        openModalWindow(root, "USB-PTS");
-    }
-
-    /**
      * Simply quits the entire application.
      */
     @FXML
