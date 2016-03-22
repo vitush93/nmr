@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.collections.FXCollections?>
-<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.MainController">
+<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.vithabada.nmr_gui.ContWindowController">
     <columnConstraints>
         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -43,7 +43,7 @@
             <Insets right="10.0" />
          </GridPane.margin></Label>
         <TextField text="1" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" GridPane.columnIndex="5" />
-        <Button fx:id="startCont" onAction="#handleStartCont" minWidth="60" mnemonicParsing="false" text="Start" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+        <Button fx:id="startContButton" onAction="#handleStartCont" minWidth="60" mnemonicParsing="false" text="Start" GridPane.columnIndex="5" GridPane.rowIndex="1" />
     </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

@@ -50,9 +50,6 @@ public class MainController implements Initializable {
     public static PulseTab selectedTab = PulseTab.HAHN_ECHO;
 
     @FXML
-    Button startCont;
-
-    @FXML
     TabPane pulseTab;
 
     @FXML
@@ -162,15 +159,6 @@ public class MainController implements Initializable {
 
         // update UI to running state
         setRunningState();
-    }
-
-    public void handleStartCont(ActionEvent actionEvent) {
-        if (!isBoardConnected()) return;
-
-        pulse = createPulse(); // create pulse with initial parameters
-        initPulse();
-
-        pulseTask = createPulseTask();
     }
 
     boolean isBoardConnected() {
