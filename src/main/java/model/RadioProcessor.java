@@ -13,11 +13,6 @@ public class RadioProcessor {
     private boolean boardConnected = false;
 
     /**
-     * Indicates whether the data capture is running.
-     */
-    private boolean running = false;
-
-    /**
      * Pulse to be executed. Allows running data capture to be stopped from any method in this class.
      */
     private Pulse<Complex[]> pulse;
@@ -31,10 +26,6 @@ public class RadioProcessor {
     }
 
     public void setPulse(Pulse<Complex[]> pulse) throws Exception {
-        if(running) {
-            throw new Exception("Cannot set pulse while scan is running.");
-        }
-
         this.pulse = pulse;
     }
 
@@ -44,14 +35,10 @@ public class RadioProcessor {
 
     public void stop() {
         pulse.stop();
-
-        running = false;
     }
 
     public void start() {
         pulse.start();
-
-        running = true;
     }
 
     public boolean isBoardConnected() {
@@ -60,10 +47,6 @@ public class RadioProcessor {
 
     public void updateBoardStatus() {
         boardConnected = (SpinAPI.INSTANCE.pb_count_boards() > 0);
-    }
-
-    public boolean isRunning() {
-        return running;
     }
 
 }
