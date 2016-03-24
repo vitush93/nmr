@@ -25,13 +25,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import libs.AlertHelper;
 import libs.FFT;
 import libs.Invokable;
 import model.PlainTextData;
+import model.RadioProcessor;
 import org.apache.commons.math3.complex.Complex;
 import api.SpinAPI;
 
@@ -48,6 +48,8 @@ import java.util.Set;
 public class MainController implements Initializable {
 
     public static PulseTab selectedTab = PulseTab.HAHN_ECHO;
+
+    private RadioProcessor radioProcessor;
 
     @FXML
     TabPane pulseTab;
@@ -97,42 +99,25 @@ public class MainController implements Initializable {
     @FXML
     Label rightStatus;
 
-    Stage stage;
-
-    /**
-     * Indicates whether the data capture is running.
-     */
-    boolean running = false;
-
-    /**
-     * Indicated whether the RadioProcessor is connected.
-     * Is continuously updated in background task which asks for board's presence
-     * every 500 milisecons.
-     */
-    boolean boardConnected = false;
-
-    /**
-     * Pulse to be executed. Allows running data capture to be stopped from any method in this class.
-     */
-    Pulse<Complex[]> pulse;
+    private Stage stage;
 
     /**
      * Task which contains pulse execution.
      */
-    Task pulseTask;
+    private Task pulseTask;
 
     /**
      * Holds HahnEcho form values.
      */
-    HahnEchoParameters hahnEchoParameters = new HahnEchoParameters();
+    private HahnEchoParameters hahnEchoParameters = new HahnEchoParameters();
 
     /**
      * Starts currently selected pulse with given parameters.
      * If no board is connected, displays alert window.
      */
     @FXML
-    void handleStart() {
-        if (!isBoardConnected()) return;
+    void handleStart() throws Exception {
+        if (!checkRadioProcessor()) return;
 
         // TODO refactor validation so that it can be used with other pulses
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -145,7 +130,10 @@ public class MainController implements Initializable {
             return;
         }
 
-        pulse = createPulse();
+        //pulse = createPulse();
+        Pulse<Complex[]> pulse = createPulse();
+        radioProcessor.setPulse(pulse);
+
         initPulse();
 
         // start data capture task in background thread
@@ -161,12 +149,12 @@ public class MainController implements Initializable {
         setRunningState();
     }
 
-    boolean isBoardConnected() {
-        if (!boardConnected) { // board is not present - display alert
+    private boolean checkRadioProcessor() {
+        if (!radioProcessor.isBoardConnected()) { // board is not present - display alert
             AlertHelper.showAlert(Alert.AlertType.ERROR, "No boards detected", "RadioProcessor is not connected.");
         }
 
-        return boardConnected;
+        return radioProcessor.isBoardConnected();
     }
 
     @FXML
@@ -189,7 +177,7 @@ public class MainController implements Initializable {
 
     @FXML
     void handleSaveData() {
-        if (pulse == null || pulse.getData() == null) {
+        if (radioProcessor.getPulse() == null || radioProcessor.getData() == null) {
             AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Nothing to save", "Start data capture first.");
 
             return;
@@ -213,12 +201,12 @@ public class MainController implements Initializable {
             }
 
             // write to file
-            PlainTextData plainTextData = new PlainTextData(pulse.getData());
+            PlainTextData plainTextData = new PlainTextData(radioProcessor.getData());
             plainTextData.toFile(file);
         }
     }
 
-    Pulse<Complex[]> createPulse() {
+    private Pulse<Complex[]> createPulse() {
         if (selectedTab == PulseTab.HAHN_ECHO) {
             if (hahnEchoParameters.getCyclops()) {
                 return new HahnEchoCYCLOPS(hahnEchoParameters);
@@ -239,17 +227,19 @@ public class MainController implements Initializable {
     @FXML
     void handleStop() {
         pulseTask.setOnSucceeded(event -> setReadyState());
-        pulse.stop();
+
+        radioProcessor.stop();
     }
 
     /**
      * Simply quits the entire application.
      */
     @FXML
-    void handleQuit() {
-        if (running) {
+    private void handleQuit() {
+        if (radioProcessor.isRunning()) {
             pulseTask.setOnSucceeded(event -> stage.close());
-            pulse.stop();
+
+            radioProcessor.stop();
         } else {
             stage.close();
         }
@@ -257,6 +247,8 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
+        radioProcessor = new RadioProcessor();
 
         // display API version and connected board count in right status.
         setRightStatus(SpinAPI.INSTANCE.pb_get_version(), SpinAPI.INSTANCE.pb_count_boards());
@@ -278,12 +270,12 @@ public class MainController implements Initializable {
     /**
      * Initialize pulse's callbacks.
      */
-    void initPulse() {
+    private void initPulse() {
         Invokable<Complex[]> updateCharts = createChartUpdateEvent();
 
-        pulse.onFetch = updateCharts;
-        pulse.onComplete = updateCharts;
-        pulse.onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
+        radioProcessor.getPulse().onFetch = updateCharts;
+        radioProcessor.getPulse().onComplete = updateCharts;
+        radioProcessor.getPulse().onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
     }
 
     /**
@@ -291,25 +283,25 @@ public class MainController implements Initializable {
      *
      * @return pulse task.
      */
-    Task createPulseTask() {
+    private Task createPulseTask() {
         return new Task<Void>() {
 
             @Override
             protected Void call() throws Exception {
-                pulse.start();
+                radioProcessor.start();
 
                 return null;
             }
         };
     }
 
-    void pulseDone(Event event) {
+    private void pulseDone(Event event) {
         setReadyState();
 
         AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Done", "Data capture has been successfully completed.");
     }
 
-    void pulseError(Event event) {
+    private void pulseError(Event event) {
         setReadyState();
 
         WorkerStateEvent workerStateEvent = (WorkerStateEvent)event;
@@ -321,7 +313,7 @@ public class MainController implements Initializable {
      *
      * @return chart update invokable
      */
-    Invokable<Complex[]> createChartUpdateEvent(LineChart<Number, Number> lineChart) {
+    private Invokable<Complex[]> createChartUpdateEvent(LineChart<Number, Number> lineChart) {
         return (sender, value) -> Platform.runLater(() -> {
             lineChart.getData().clear();
 
@@ -350,7 +342,7 @@ public class MainController implements Initializable {
      *
      * @return chart update invokable
      */
-    Invokable<Complex[]> createChartUpdateEvent() {
+    private Invokable<Complex[]> createChartUpdateEvent() {
         return (sender, value) -> {
             Invokable<Complex[]> dataChartUpdate = createChartUpdateEvent(dataChart);
             dataChartUpdate.invoke(sender, value);
@@ -369,9 +361,7 @@ public class MainController implements Initializable {
     /**
      * Updates UI to ready state: ready to start data capture - equivalent to initial state.
      */
-    void setReadyState() {
-        running = false;
-
+    private void setReadyState() {
         leftStatus.setText("Ready");
 
         startButton.setDisable(false);
@@ -382,9 +372,7 @@ public class MainController implements Initializable {
     /**
      * Updates UI to running state: state during the data capture.
      */
-    void setRunningState() {
-        running = true;
-
+    private void setRunningState() {
         startButton.setDisable(true);
         stopButton.setDisable(false);
         dataMenu.setDisable(true);
@@ -396,7 +384,7 @@ public class MainController implements Initializable {
      * @param apiVersion      SpinAPI version string.
      * @param connectedBoards number of connected SpinCore boards.
      */
-    void setRightStatus(String apiVersion, int connectedBoards) {
+    private void setRightStatus(String apiVersion, int connectedBoards) {
         String boardStatus = String.format("SpinAPI Version: %s, Connected boards: %d", apiVersion, connectedBoards);
 
         rightStatus.setText(boardStatus);
@@ -405,9 +393,9 @@ public class MainController implements Initializable {
     /**
      * Starts background task which continuously checks if RadioProcessor is connected.
      */
-    void startCheckForBoardBackgroundTask() {
+    private void startCheckForBoardBackgroundTask() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0), event -> {
-            boardConnected = (SpinAPI.INSTANCE.pb_count_boards() > 0);
+            radioProcessor.updateBoardStatus();
 
             setRightStatus(SpinAPI.INSTANCE.pb_get_version(), SpinAPI.INSTANCE.pb_count_boards());
         }), new KeyFrame(Duration.millis(500)));
@@ -416,13 +404,13 @@ public class MainController implements Initializable {
         timeline.play();
     }
 
-    public void init(Stage stage) {
+    void init(Stage stage) {
         this.stage = stage;
 
         this.stage.setOnCloseRequest(event -> handleQuit());
     }
 
-    enum PulseTab {
+    private enum PulseTab {
         HAHN_ECHO,
         CPMG
     }

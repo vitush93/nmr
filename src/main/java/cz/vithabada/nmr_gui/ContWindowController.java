@@ -20,7 +20,7 @@ public class ContWindowController implements Initializable {
     @FXML
     void handleStartCont(ActionEvent actionEvent) {
         // TODO refactor
-//        if (!isBoardConnected()) return;
+//        if (!checkRadioProcessor()) return;
 //
 //        pulse = createPulse(); // create pulse with initial parameters
 //        initPulse();

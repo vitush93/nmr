@@ -7,10 +7,19 @@ import org.apache.commons.math3.complex.Complex;
 
 public class RadioProcessor {
 
+    /**
+     * Indicated whether the RadioProcessor is connected.
+     */
     private boolean boardConnected = false;
 
+    /**
+     * Indicates whether the data capture is running.
+     */
     private boolean running = false;
 
+    /**
+     * Pulse to be executed. Allows running data capture to be stopped from any method in this class.
+     */
     private Pulse<Complex[]> pulse;
 
     public RadioProcessor() {
@@ -27,6 +36,22 @@ public class RadioProcessor {
         }
 
         this.pulse = pulse;
+    }
+
+    public Complex[] getData() {
+        return pulse.getData();
+    }
+
+    public void stop() {
+        pulse.stop();
+
+        running = false;
+    }
+
+    public void start() {
+        pulse.start();
+
+        running = true;
     }
 
     public boolean isBoardConnected() {
