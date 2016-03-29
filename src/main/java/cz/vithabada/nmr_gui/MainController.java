@@ -7,12 +7,16 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -23,6 +27,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import libs.AlertHelper;
 import libs.FFT;
 import libs.Invokable;
@@ -38,8 +43,7 @@ import javax.validation.ValidatorFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 public class MainController implements Initializable {
 
@@ -144,20 +148,69 @@ public class MainController implements Initializable {
 
     @FXML
     void handleContButton(ActionEvent actionEvent) {
-        Parent root;
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ContWindow.fxml"));
-            root = loader.load();
 
-            Stage stage = new Stage();
-            stage.setTitle("Start a continuous scan");
-            Scene scene = new Scene(root, 500, 140);
-            stage.setScene(scene);
+        // Create the custom dialog.
+        Dialog<ContExperiment> dialog = new Dialog<>();
+        dialog.setTitle("Experiment dialog");
+        dialog.setHeaderText("Start a continuous experiment");
 
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Set the button types.
+        ButtonType loginButtonType = new ButtonType("Start", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+        // Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        ChoiceBox<String> parameters = new ChoiceBox<>(FXCollections.observableArrayList(
+                "Param1 (dB)", "Param2 (ms)", "Param3 (MHz)"
+        ));
+        parameters.setValue("Param1 (dB)");
+        TextField step = new TextField();
+        step.setPromptText("Step");
+        step.setText("1");
+        TextField iterations = new TextField();
+        iterations.setPromptText("Iterations");
+        iterations.setText("1");
+
+        grid.add(new Label("Parameter:"), 0, 0);
+        grid.add(parameters, 1, 0);
+        grid.add(new Label("Step:"), 0, 1);
+        grid.add(step, 1, 1);
+        grid.add(new Label("Iterations:"), 0, 2);
+        grid.add(iterations, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Request focus on the username field by default.
+        Platform.runLater(() -> parameters.requestFocus());
+
+        // Convert the result to a username-password-pair when the login button is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == loginButtonType) {
+                try {
+                    String parameterVal = parameters.getValue();
+                    double stepVal = Double.parseDouble(step.getText());
+                    int iterationsVal = Integer.parseInt(iterations.getText());
+
+                    return new ContExperiment(parameterVal, stepVal, iterationsVal);
+                } catch (NumberFormatException e) {
+                    AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid number", "Please enter a valid number.");
+                }
+
+                return null;
+            }
+
+            return null;
+        });
+
+        Optional<ContExperiment> result = dialog.showAndWait();
+
+        result.ifPresent(contExperimentConsumer -> {
+            System.out.println("Parameter=" + contExperimentConsumer.getParameter() + ", Step=" + contExperimentConsumer.getStep() + ", Iterations=" + contExperimentConsumer.getIterations());
+        });
     }
 
     @FXML
@@ -263,7 +316,7 @@ public class MainController implements Initializable {
     private void pulseError(Event event) {
         setReadyState();
 
-        WorkerStateEvent workerStateEvent = (WorkerStateEvent)event;
+        WorkerStateEvent workerStateEvent = (WorkerStateEvent) event;
         leftStatus.setText("Error has occured during program execution: " + workerStateEvent.getSource().getException().getMessage());
     }
 
@@ -377,5 +430,41 @@ public class MainController implements Initializable {
                 e.printStackTrace();
             }
         });
+    }
+
+    private class ContExperiment {
+        String parameter;
+        double step;
+        int iterations;
+
+        public ContExperiment(String p, double s, int i) {
+            this.parameter = p;
+            this.step = s;
+            this.iterations = i;
+        }
+
+        public String getParameter() {
+            return parameter;
+        }
+
+        public void setParameter(String parameter) {
+            this.parameter = parameter;
+        }
+
+        public double getStep() {
+            return step;
+        }
+
+        public void setStep(double step) {
+            this.step = step;
+        }
+
+        public int getIterations() {
+            return iterations;
+        }
+
+        public void setIterations(int iterations) {
+            this.iterations = iterations;
+        }
     }
 }
