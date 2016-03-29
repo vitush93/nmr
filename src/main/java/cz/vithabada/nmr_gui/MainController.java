@@ -182,6 +182,29 @@ public class MainController implements Initializable {
         grid.add(new Label("Iterations:"), 0, 2);
         grid.add(iterations, 1, 2);
 
+        Node startButton = dialog.getDialogPane().lookupButton(loginButtonType);
+
+        // Do some validation (using the Java 8 lambda syntax).
+        step.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                double stepVal = Double.parseDouble(newValue);
+
+                startButton.setDisable(false);
+            } catch (NumberFormatException e) {
+                startButton.setDisable(true);
+            }
+        });
+
+        iterations.textProperty().addListener(((observable, oldValue, newValue) -> {
+            try {
+                int iterationsVal = Integer.parseInt(newValue);
+
+                startButton.setDisable(false);
+            } catch (NumberFormatException e) {
+                startButton.setDisable(true);
+            }
+        }));
+
         dialog.getDialogPane().setContent(grid);
 
         // Request focus on the username field by default.
@@ -197,10 +220,8 @@ public class MainController implements Initializable {
 
                     return new ContExperiment(parameterVal, stepVal, iterationsVal);
                 } catch (NumberFormatException e) {
-                    AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid number", "Please enter a valid number.");
+                    return null;
                 }
-
-                return null;
             }
 
             return null;
