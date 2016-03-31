@@ -5,11 +5,13 @@ import cz.vithabada.nmr_gui.forms.FormFactory;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.pulse.ContExperiment;
 import cz.vithabada.nmr_gui.pulse.ContParameter;
+import cz.vithabada.nmr_gui.pulse.Pulse;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -123,8 +125,8 @@ public class MainController implements Initializable {
 
         experiment.init(hahnEchoParameters, selectedTab);
 
-        initPulseEvents();
-        initPulseTaskEvents();
+        initPulseEvents(experiment.getRadioProcessor().getPulse());
+        initPulseTaskEvents(experiment.getTask());
 
         Thread t = new Thread(experiment.getTask());
         t.setDaemon(true);
@@ -336,17 +338,17 @@ public class MainController implements Initializable {
     /**
      * Initialize pulse's callbacks.
      */
-    private void initPulseEvents() {
+    private void initPulseEvents(Pulse pulse) {
         Invokable<Complex[]> updateCharts = createChartUpdateEvent();
 
-        experiment.getRadioProcessor().getPulse().onFetch = updateCharts;
-        experiment.getRadioProcessor().getPulse().onComplete = updateCharts;
-        experiment.getRadioProcessor().getPulse().onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
+        pulse.onFetch = updateCharts;
+        pulse.onComplete = updateCharts;
+        pulse.onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
     }
 
-    private void initPulseTaskEvents() throws Exception {
-        experiment.getTask().setOnSucceeded(this::pulseDone);
-        experiment.getTask().setOnFailed(this::pulseError);
+    private void initPulseTaskEvents(Task task) throws Exception {
+        task.setOnSucceeded(this::pulseDone);
+        task.setOnFailed(this::pulseError);
     }
 
     private void pulseDone(Event event) {

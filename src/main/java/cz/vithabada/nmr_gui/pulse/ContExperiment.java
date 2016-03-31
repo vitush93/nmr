@@ -1,11 +1,19 @@
 package cz.vithabada.nmr_gui.pulse;
 
-import cz.vithabada.nmr_gui.MainController;
+import cz.vithabada.nmr_gui.forms.Parameters;
+import cz.vithabada.nmr_gui.libs.Invokable;
+import cz.vithabada.nmr_gui.model.Experiment;
+import org.apache.commons.math3.complex.Complex;
 
 public class ContExperiment {
-    ContParameter parameter;
-    double step;
-    int iterations;
+    private ContParameter parameter;
+    private Experiment experiment;
+    private double step;
+    private int iterations;
+
+    Invokable<Complex[]> onScan;
+    Invokable<Object> onScanComplete;
+    Invokable<Void> onError;
 
     public ContExperiment(ContParameter p, double s, int i) {
         this.parameter = p;
@@ -35,5 +43,13 @@ public class ContExperiment {
 
     public void setIterations(int iterations) {
         this.iterations = iterations;
+    }
+
+    public void init(Parameters parameters, Experiment.Pulse pulseEnum) throws Exception {
+        experiment.init(parameters, pulseEnum);
+    }
+
+    public void start() {
+        // TODO start continuous experiment
     }
 }

@@ -1,5 +1,6 @@
 package cz.vithabada.nmr_gui;
 
+import cz.vithabada.nmr_gui.libs.PTS;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -90,20 +91,16 @@ public class DeviceParamsController implements Initializable {
 
     @FXML
     void setPts() {
-        double maxFreq = 250;
-        int is160 = 0;
-        int is3200 = 0;
-        int allowPhase = 0;
-        int noPTS = 1;
-
         try {
             double freq = Double.parseDouble(ptsTextField.getText());
 
-            if (SpinAPI.INSTANCE.set_pts(maxFreq, is160, is3200, allowPhase, noPTS, freq, 0) != 0) {
+            try {
+                PTS.setFrequency(freq);
+
+                setStatusLabel(ptsLabel, DeviceStatus.OK);
+            } catch (PTS.PTSException e) {
                 setStatusLabel(ptsLabel, DeviceStatus.FAIL);
                 AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", SpinAPI.INSTANCE.spinpts_get_error());
-            } else {
-                setStatusLabel(ptsLabel, DeviceStatus.OK);
             }
         } catch (NumberFormatException e) {
             AlertHelper.showAlert(Alert.AlertType.WARNING, "Invalid input", "Please enter a valid number.");
