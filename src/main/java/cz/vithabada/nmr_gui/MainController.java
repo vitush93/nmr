@@ -3,22 +3,20 @@ package cz.vithabada.nmr_gui;
 import com.dooapp.fxform.FXForm;
 import cz.vithabada.nmr_gui.forms.FormFactory;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
+import cz.vithabada.nmr_gui.pulse.ContExperiment;
+import cz.vithabada.nmr_gui.pulse.ContParameter;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
@@ -27,7 +25,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.util.Pair;
 import libs.AlertHelper;
 import libs.FFT;
 import libs.Invokable;
@@ -41,7 +38,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -164,10 +160,15 @@ public class MainController implements Initializable {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        ChoiceBox<String> parameters = new ChoiceBox<>(FXCollections.observableArrayList(
-                "Param1 (dB)", "Param2 (ms)", "Param3 (MHz)"
+        ContParameter ampGain = new ContParameter(ContParameter.AMP_GAIN, "Amp gain (dB)");
+        ContParameter tau = new ContParameter(ContParameter.TAU, "Tau (us)");
+        ContParameter repetitionDelay = new ContParameter(ContParameter.REPETITION_DELAY, "Rep delay (s)");
+        ContParameter amplitude = new ContParameter(ContParameter.AMPLITUDE, "Amplitude");
+        ContParameter ptsFreq = new ContParameter(ContParameter.PTS_FREQ, "PTS Freq (MHz)");
+        ChoiceBox<ContParameter> parameters = new ChoiceBox<>(FXCollections.observableArrayList(
+                ampGain, tau, repetitionDelay, amplitude, ptsFreq
         ));
-        parameters.setValue("Param1 (dB)");
+        parameters.setValue(ampGain);
         TextField step = new TextField();
         step.setPromptText("Step");
         step.setText("1");
@@ -214,7 +215,7 @@ public class MainController implements Initializable {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == loginButtonType) {
                 try {
-                    String parameterVal = parameters.getValue();
+                    ContParameter parameterVal = parameters.getValue();
                     double stepVal = Double.parseDouble(step.getText());
                     int iterationsVal = Integer.parseInt(iterations.getText());
 
@@ -229,9 +230,29 @@ public class MainController implements Initializable {
 
         Optional<ContExperiment> result = dialog.showAndWait();
 
-        result.ifPresent(contExperimentConsumer -> {
-            System.out.println("Parameter=" + contExperimentConsumer.getParameter() + ", Step=" + contExperimentConsumer.getStep() + ", Iterations=" + contExperimentConsumer.getIterations());
-        });
+        result.ifPresent(this::contExperiment);
+    }
+
+    private void contExperiment(ContExperiment contExperiment) {
+        // TODO create Cont Experiment
+        switch (contExperiment.getParameter().getId()) {
+            case ContParameter.AMP_GAIN:
+                break;
+            case ContParameter.AMPLITUDE:
+                break;
+            case ContParameter.PTS_FREQ:
+                break;
+            case ContParameter.REPETITION_DELAY:
+                break;
+            case ContParameter.TAU:
+                break;
+            default:
+                try {
+                    throw new Exception("Invalid experiment parameter");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+        }
     }
 
     @FXML
@@ -453,39 +474,4 @@ public class MainController implements Initializable {
         });
     }
 
-    private class ContExperiment {
-        String parameter;
-        double step;
-        int iterations;
-
-        public ContExperiment(String p, double s, int i) {
-            this.parameter = p;
-            this.step = s;
-            this.iterations = i;
-        }
-
-        public String getParameter() {
-            return parameter;
-        }
-
-        public void setParameter(String parameter) {
-            this.parameter = parameter;
-        }
-
-        public double getStep() {
-            return step;
-        }
-
-        public void setStep(double step) {
-            this.step = step;
-        }
-
-        public int getIterations() {
-            return iterations;
-        }
-
-        public void setIterations(int iterations) {
-            this.iterations = iterations;
-        }
-    }
 }
