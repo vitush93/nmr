@@ -4,15 +4,21 @@ import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import org.apache.commons.math3.complex.Complex;
 import cz.vithabada.nmr_gui.api.SpinAPI;
 
+/**
+ * CYCLOPS-enabled variation of HahnEcho class
+ *
+ * @see HahnEcho
+ * @author Vit Habada
+ */
 public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
 
-    final SpinAPI api;
+    private final SpinAPI api;
 
-    Complex[] data;
+    private Complex[] data;
 
-    boolean running = false;
+    private boolean running = false;
 
-    HahnEchoParameters parameters;
+    private HahnEchoParameters parameters;
 
     public HahnEchoCYCLOPS(HahnEchoParameters hahnEchoParameters) {
         this.api = SpinAPI.INSTANCE;
@@ -283,7 +289,7 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         }
     }
 
-    void createData(int[] real, int[] imag) {
+    private void createData(int[] real, int[] imag) {
         for (int i = 0; i < real.length; i++) {
             data[i] = new Complex(real[i], imag[i]);
         }

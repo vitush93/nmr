@@ -27,7 +27,7 @@ import org.mapdb.DBMaker;
  */
 public class Storage {
 
-    DB db;
+    private DB db;
 
     public Storage(String filename, String password) {
         db = DBMaker.fileDB(new File(filename))
@@ -36,10 +36,21 @@ public class Storage {
                 .make();
     }
 
+    /**
+     * Retrieve data from the file storage.
+     *
+     * @param name
+     * @param <K>
+     * @param <V>
+     * @return
+     */
     public <K, V> Map<K, V> map(String name) {
         return db.treeMap(name);
     }
 
+    /**
+     * Flush data to the file storage.
+     */
     public void flush() {
         db.commit();
     }

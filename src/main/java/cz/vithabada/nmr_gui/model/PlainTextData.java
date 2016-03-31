@@ -7,10 +7,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
+/**
+ * Represents collected experiment data as plain text to be stored in file.
+ *
+ * @author Vit Habada
+ */
 public class PlainTextData {
 
-    Complex[] data;
+    /**
+     * Measured experiment data.
+     */
+    private Complex[] data;
 
+    /**
+     * @param data experiment data.
+     */
     public PlainTextData(Complex[] data) {
         this.data = data;
     }
@@ -28,6 +39,11 @@ public class PlainTextData {
         return sb.toString();
     }
 
+    /**
+     * Save data to file.
+     *
+     * @param file File to be saved.
+     */
     public void toFile(File file) {
         try {
             PrintWriter pw = new PrintWriter(file);

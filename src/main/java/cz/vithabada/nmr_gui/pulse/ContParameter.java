@@ -1,6 +1,13 @@
 package cz.vithabada.nmr_gui.pulse;
 
+/**
+ * @author Vit Habada
+ */
 public class ContParameter {
+
+    /**
+     * Parameter identifier constants.
+     */
     public static final int
             AMP_GAIN = 0,
             TAU = 1,
@@ -8,9 +15,20 @@ public class ContParameter {
             AMPLITUDE = 3,
             PTS_FREQ = 4;
 
+    /**
+     * Parameter identifier.
+     */
     private int id;
+
+    /**
+     * Displayed parameter name.
+     */
     private String name;
 
+    /**
+     * @param id parameter identifier.
+     * @param name parameter name.
+     */
     public ContParameter(int id, String name) {
         this.id = id;
         this.name = name;

@@ -9,6 +9,11 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import cz.vithabada.nmr_gui.libs.AlertHelper;
 
+/**
+ * Program's entry point.
+ *
+ * @author Vit Habada
+ */
 public class MainApp extends Application {
 
     @Override

@@ -3,8 +3,18 @@ package cz.vithabada.nmr_gui.api;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 
+/**
+ * Exposes SpinCore API.
+ * Contains methods and constants found in SpinAPI.dll
+ * For more info refer to the SpinCore documentation.
+ *
+ * @author Vit Habada
+ */
 public interface SpinAPI extends Library {
 
+    /**
+     * Imported constants found in DLL.
+     */
     static final int FREQ_REGS = 1;
     static final int COS_PHASE_REGS = 51;
     static final int SIN_PHASE_REGS = 50;

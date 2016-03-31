@@ -5,19 +5,39 @@ import java.util.logging.Logger;
 
 import org.apache.commons.math3.complex.Complex;
 
+/**
+ * Mock data source.
+ *
+ * @author Vit Habada
+ */
 public class RandomDataSource extends Pulse<Complex[]> {
 
-    final int length;
+    /**
+     * Sample size after each simulated scan.
+     */
+    private final int length;
 
-    boolean running;
+    /**
+     * Flag that indicates whether the experiment is running.
+     */
+    private boolean running;
 
-    volatile Complex[] data;
+    /**
+     * Collected data.
+     */
+    private volatile Complex[] data;
 
+    /**
+     * @param len desired sample size.
+     */
     public RandomDataSource(int len) {
         this.length = len;
         this.running = false;
     }
 
+    /**
+     * Starts the experiment simulation.
+     */
     @Override
     public void start() {
         running = true;
@@ -47,7 +67,10 @@ public class RandomDataSource extends Pulse<Complex[]> {
         }
     }
 
-    synchronized void generateData() {
+    /**
+     * Generates data sample.
+     */
+    private synchronized void generateData() {
         data = new Complex[length];
 
         for (int i = 0; i < length; i++) {
@@ -55,11 +78,19 @@ public class RandomDataSource extends Pulse<Complex[]> {
         }
     }
 
+    /**
+     * Stops the simulated experiment.
+     */
     @Override
     public void stop() {
         running = false;
     }
 
+    /**
+     * Retrieves collected data.
+     *
+     * @return mock data from the simulated experiment.
+     */
     @Override
     public Complex[] getData() {
         return data;

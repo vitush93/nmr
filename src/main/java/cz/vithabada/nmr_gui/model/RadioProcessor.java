@@ -5,6 +5,11 @@ import cz.vithabada.nmr_gui.api.SpinAPI;
 import cz.vithabada.nmr_gui.pulse.Pulse;
 import org.apache.commons.math3.complex.Complex;
 
+/**
+ * Provides SpinCore RadioProcessor management logic.
+ *
+ * @author Vit Habada
+ */
 public class RadioProcessor {
 
     /**
@@ -45,6 +50,9 @@ public class RadioProcessor {
         return boardConnected;
     }
 
+    /**
+     * Refresh board status - connected / disconnected.
+     */
     public void updateBoardStatus() {
         boardConnected = (SpinAPI.INSTANCE.pb_count_boards() > 0);
     }

@@ -5,8 +5,17 @@ import javafx.beans.property.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+/**
+ * Container class for HahnEcho pulse parameters.
+ * Contains Hibernate Validator validation rules.
+ *
+ * @author Vit Habada
+ */
 public class HahnEchoParameters extends Parameters {
 
+    /**
+     * Pulse parameters.
+     */
     DoubleProperty adcFrequency = new SimpleDoubleProperty(75);
     DoubleProperty spectrometerFrequency = new SimpleDoubleProperty(2);
     IntegerProperty spectralWidth = new SimpleIntegerProperty(642);

@@ -4,21 +4,46 @@ import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import org.apache.commons.math3.complex.Complex;
 import cz.vithabada.nmr_gui.api.SpinAPI;
 
+/**
+ * Hahn echo pulse series programming.
+ * Configures the entire pulse series to the SpinCore RadioProcessor's registers and
+ * controls the experiment.
+ *
+ * @author Vit Habada
+ */
 public class HahnEcho extends Pulse<Complex[]> {
 
-    final SpinAPI api;
+    /**
+     * SpinCore API reference.
+     */
+    private final SpinAPI api;
 
-    Complex[] data;
+    /**
+     * Collected data in current scan.
+     */
+    private Complex[] data;
 
-    boolean running = false;
+    /**
+     * Flag which indicates whether the experiment is running.
+     */
+    private boolean running = false;
 
-    HahnEchoParameters parameters;
+    /**
+     * Contains validated pulse parameters.
+     */
+    private HahnEchoParameters parameters;
 
+    /**
+     * @param hahnEchoParameters pulse parameters.
+     */
     public HahnEcho(HahnEchoParameters hahnEchoParameters) {
         this.api = SpinAPI.INSTANCE;
         this.parameters = hahnEchoParameters;
     }
 
+    /**
+     * Programs and starts the experiment.
+     */
     @Override
     public void start() {
         running = true;
@@ -172,12 +197,21 @@ public class HahnEcho extends Pulse<Complex[]> {
         }
     }
 
-    void createData(int[] real, int[] imag) {
+    /**
+     * Updates the data property with Complex data.
+     *
+     * @param real real part of the collected data.
+     * @param imag imaginary part of the collected data.
+     */
+    private void createData(int[] real, int[] imag) {
         for (int i = 0; i < real.length; i++) {
             data[i] = new Complex(real[i], imag[i]);
         }
     }
 
+    /**
+     * Stops the experiment.
+     */
     @Override
     public void stop() {
         running = false;
@@ -192,6 +226,11 @@ public class HahnEcho extends Pulse<Complex[]> {
         }
     }
 
+    /**
+     * Retrieves content of the data property, even when the experiment is running.
+     *
+     * @return currently collected data.
+     */
     @Override
     synchronized public Complex[] getData() {
         if (data == null) {

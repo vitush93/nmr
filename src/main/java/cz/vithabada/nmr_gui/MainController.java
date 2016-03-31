@@ -43,10 +43,19 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * @author Vit Habada
+ */
 public class MainController implements Initializable {
 
+    /**
+     * Currently selected pulse tab.
+     */
     private static Experiment.Pulse selectedTab = Experiment.Pulse.HAHN_ECHO;
 
+    /**
+     *
+     */
     private Experiment experiment;
 
     @FXML
@@ -136,6 +145,12 @@ public class MainController implements Initializable {
         setRunningState();
     }
 
+    /**
+     * Checks if SpinCore RadioProcessor is connected to the PC.
+     * Displays alert dialog if the device is not connected.
+     *
+     * @return true if connected, false otherwise.
+     */
     private boolean checkRadioProcessor() {
         if (!experiment.getRadioProcessor().isBoardConnected()) { // board is not present - display alert
             AlertHelper.showAlert(Alert.AlertType.ERROR, "No boards detected", "RadioProcessor is not connected.");
@@ -144,6 +159,12 @@ public class MainController implements Initializable {
         return experiment.getRadioProcessor().isBoardConnected();
     }
 
+    /**
+     * Handler for continuous experiment button.
+     * Displays experiment configuration dialog.
+     *
+     * @param actionEvent
+     */
     @FXML
     void handleContButton(ActionEvent actionEvent) {
 
@@ -230,12 +251,20 @@ public class MainController implements Initializable {
             return null;
         });
 
+        // display the dialog
         Optional<ContExperiment> result = dialog.showAndWait();
 
+        // run the experiment with entered parameters
         result.ifPresent(this::contExperiment);
     }
 
+    /**
+     * Configures and runs the continuous experiment.
+     *
+     * @param contExperiment data from continous experiment dialog.
+     */
     private void contExperiment(ContExperiment contExperiment) {
+
         // TODO create Cont Experiment
         switch (contExperiment.getParameter().getId()) {
             case ContParameter.AMP_GAIN:
@@ -257,6 +286,9 @@ public class MainController implements Initializable {
         }
     }
 
+    /**
+     * Displays file save dialog and saves the recorded data to ASCII file.
+     */
     @FXML
     void handleSaveData() {
         if (experiment.getRadioProcessor().getPulse() == null || experiment.getRadioProcessor().getData() == null) {
@@ -346,17 +378,33 @@ public class MainController implements Initializable {
         pulse.onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
     }
 
+    /**
+     * Initialize pulse task events.
+     *
+     * @param task
+     * @throws Exception
+     */
     private void initPulseTaskEvents(Task task) throws Exception {
         task.setOnSucceeded(this::pulseDone);
         task.setOnFailed(this::pulseError);
     }
 
+    /**
+     * Update UI after experiment is finished and show information dialog.
+     *
+     * @param event
+     */
     private void pulseDone(Event event) {
         setReadyState();
 
         AlertHelper.showAlert(Alert.AlertType.INFORMATION, "Done", "Data capture has been successfully completed.");
     }
 
+    /**
+     * Update UI and show information dialog when error occurred.
+     *
+     * @param event
+     */
     private void pulseError(Event event) {
         setReadyState();
 

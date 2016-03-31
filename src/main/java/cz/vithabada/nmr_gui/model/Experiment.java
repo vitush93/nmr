@@ -7,16 +7,34 @@ import cz.vithabada.nmr_gui.pulse.HahnEchoCYCLOPS;
 import javafx.concurrent.Task;
 import org.apache.commons.math3.complex.Complex;
 
+/**
+ * Contains experiment management logic.
+ *
+ * @author Vit Habada
+ */
 public class Experiment {
 
+    /**
+     * RadioProcessor configurator.
+     */
     private RadioProcessor radioProcessor;
 
+    /**
+     * Task for the experiment run.
+     */
     private Task task;
 
     public Experiment() {
         this.radioProcessor = new RadioProcessor();
     }
 
+    /**
+     * Initiates experiment with given parameters.
+     *
+     * @param parameters pulse parameters.
+     * @param pulseEnum pulse type.
+     * @throws Exception
+     */
     public void init(Parameters parameters, Pulse pulseEnum) throws Exception {
         cz.vithabada.nmr_gui.pulse.Pulse<Complex[]> pulse = null;
 
@@ -64,6 +82,9 @@ public class Experiment {
         return radioProcessor;
     }
 
+    /**
+     * Determines the pulse series type.
+     */
     public enum Pulse {
         HAHN_ECHO,
         CPMG

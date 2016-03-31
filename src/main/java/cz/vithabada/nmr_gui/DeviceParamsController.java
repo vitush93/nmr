@@ -9,7 +9,6 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 import cz.vithabada.nmr_gui.libs.AlertHelper;
 import cz.vithabada.nmr_gui.libs.RS232_Attenuator;
-import cz.vithabada.nmr_gui.libs.RS232_AttenuatorException;
 import cz.vithabada.nmr_gui.api.FTDI_Device;
 import cz.vithabada.nmr_gui.api.SpinAPI;
 
@@ -78,7 +77,7 @@ public class DeviceParamsController implements Initializable {
             setStatusLabel(gainLabel, DeviceStatus.OK);
         } catch (NumberFormatException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid input", "Gain (dB): Please enter a valid number.");
-        } catch (RS232_AttenuatorException e) {
+        } catch (RS232_Attenuator.RS232_AttenuatorException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Invalid input", e.getMessage());
         } catch (SerialPortException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
