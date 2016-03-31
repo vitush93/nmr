@@ -20,6 +20,7 @@ public class Experiment {
     public void init(Parameters parameters, Pulse pulseEnum) throws Exception {
         cz.vithabada.nmr_gui.pulse.Pulse<Complex[]> pulse = null;
 
+        // create pulse from Parameters
         if (pulseEnum == Pulse.HAHN_ECHO) {
             HahnEchoParameters hahnEchoParameters = (HahnEchoParameters) parameters;
 
@@ -36,7 +37,7 @@ public class Experiment {
         radioProcessor.setPulse(pulse);
 
         // initialize pulse task
-        task = new Task<Void>() {
+        setTask(new Task<Void>() {
 
             @Override
             protected Void call() throws Exception {
@@ -44,7 +45,11 @@ public class Experiment {
 
                 return null;
             }
-        };
+        });
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
     }
 
     public Task getTask() throws Exception {

@@ -1,13 +1,12 @@
 package cz.vithabada.nmr_gui.pulse;
 
-import cz.vithabada.nmr_gui.forms.Parameters;
 import cz.vithabada.nmr_gui.libs.Invokable;
 import cz.vithabada.nmr_gui.model.Experiment;
 import org.apache.commons.math3.complex.Complex;
 
-public class ContExperiment {
+public class ContExperiment extends Experiment {
+
     private ContParameter parameter;
-    private Experiment experiment;
     private double step;
     private int iterations;
 
@@ -43,10 +42,6 @@ public class ContExperiment {
 
     public void setIterations(int iterations) {
         this.iterations = iterations;
-    }
-
-    public void init(Parameters parameters, Experiment.Pulse pulseEnum) throws Exception {
-        experiment.init(parameters, pulseEnum);
     }
 
     public void start() {
