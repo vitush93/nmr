@@ -1,4 +1,4 @@
-package api;
+package cz.vithabada.nmr_gui.api;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;

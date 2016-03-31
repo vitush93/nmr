@@ -1,4 +1,4 @@
-package libs;
+package cz.vithabada.nmr_gui.libs;
 
 
 import javafx.scene.control.Alert;

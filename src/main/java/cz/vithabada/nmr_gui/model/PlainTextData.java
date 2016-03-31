@@ -1,4 +1,4 @@
-package model;
+package cz.vithabada.nmr_gui.model;
 
 
 import org.apache.commons.math3.complex.Complex;

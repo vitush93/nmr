@@ -1,6 +1,6 @@
 package cz.vithabada.nmr_gui.pulse;
 
-import libs.Invokable;
+import cz.vithabada.nmr_gui.libs.Invokable;
 
 public abstract class Pulse<T> {
 

@@ -1,4 +1,4 @@
-package libs;
+package cz.vithabada.nmr_gui.libs;
 
 /**
  * @deprecated use org.apache.commons.math3.complex.Complex instead.

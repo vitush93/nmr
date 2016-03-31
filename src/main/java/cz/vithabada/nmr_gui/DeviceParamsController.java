@@ -6,11 +6,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
-import libs.AlertHelper;
-import libs.RS232_Attenuator;
-import libs.RS232_AttenuatorException;
-import api.FTDI_Device;
-import api.SpinAPI;
+import cz.vithabada.nmr_gui.libs.AlertHelper;
+import cz.vithabada.nmr_gui.libs.RS232_Attenuator;
+import cz.vithabada.nmr_gui.libs.RS232_AttenuatorException;
+import cz.vithabada.nmr_gui.api.FTDI_Device;
+import cz.vithabada.nmr_gui.api.SpinAPI;
 
 import java.net.URL;
 import java.util.ResourceBundle;

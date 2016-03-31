@@ -1,4 +1,4 @@
-package model;
+package cz.vithabada.nmr_gui.model;
 
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.forms.Parameters;

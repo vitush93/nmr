@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import libs.AlertHelper;
+import cz.vithabada.nmr_gui.libs.AlertHelper;
 
 public class MainApp extends Application {
 

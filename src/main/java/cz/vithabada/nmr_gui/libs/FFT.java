@@ -1,4 +1,4 @@
-package libs;
+package cz.vithabada.nmr_gui.libs;
 
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;

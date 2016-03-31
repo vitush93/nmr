@@ -1,4 +1,4 @@
-package model;
+package cz.vithabada.nmr_gui.model;
 
 import java.io.File;
 import java.util.Map;

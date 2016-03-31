@@ -1,7 +1,7 @@
-package model;
+package cz.vithabada.nmr_gui.model;
 
 
-import api.SpinAPI;
+import cz.vithabada.nmr_gui.api.SpinAPI;
 import cz.vithabada.nmr_gui.pulse.Pulse;
 import org.apache.commons.math3.complex.Complex;
 
