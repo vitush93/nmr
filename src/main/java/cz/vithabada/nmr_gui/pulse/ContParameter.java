@@ -26,12 +26,18 @@ public class ContParameter {
     private String name;
 
     /**
-     * @param id parameter identifier.
+     * Initial parameter value.
+     */
+    private double initialValue;
+
+    /**
+     * @param id   parameter identifier.
      * @param name parameter name.
      */
-    public ContParameter(int id, String name) {
+    public ContParameter(int id, String name, double initialValue) {
         this.id = id;
         this.name = name;
+        this.initialValue = initialValue;
     }
 
     public int getId() {
@@ -53,5 +59,13 @@ public class ContParameter {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    public double getInitialValue() {
+        return initialValue;
+    }
+
+    public void setInitialValue(double initialValue) {
+        this.initialValue = initialValue;
     }
 }

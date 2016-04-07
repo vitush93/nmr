@@ -64,6 +64,7 @@ public class RandomDataSource extends Pulse<Complex[]> {
         synchronized (this) {
             generateData();
             onComplete.invoke(this, data);
+            onDone.invoke(this, null);
         }
     }
 

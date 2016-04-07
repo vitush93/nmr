@@ -1,11 +1,11 @@
 package cz.vithabada.nmr_gui;
 
 import com.dooapp.fxform.FXForm;
+import cz.vithabada.nmr_gui.api.FTDI_Device;
 import cz.vithabada.nmr_gui.forms.FormFactory;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
-import cz.vithabada.nmr_gui.pulse.ContExperiment;
-import cz.vithabada.nmr_gui.pulse.ContParameter;
-import cz.vithabada.nmr_gui.pulse.Pulse;
+import cz.vithabada.nmr_gui.libs.PTS;
+import cz.vithabada.nmr_gui.pulse.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -183,11 +183,18 @@ public class MainController implements Initializable {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        ContParameter ampGain = new ContParameter(ContParameter.AMP_GAIN, "Amp gain (dB)");
-        ContParameter tau = new ContParameter(ContParameter.TAU, "Tau (us)");
-        ContParameter repetitionDelay = new ContParameter(ContParameter.REPETITION_DELAY, "Rep delay (s)");
-        ContParameter amplitude = new ContParameter(ContParameter.AMPLITUDE, "Amplitude");
-        ContParameter ptsFreq = new ContParameter(ContParameter.PTS_FREQ, "PTS Freq (MHz)");
+        double ampGainValue = Double.parseDouble(deviceParamsController.getAttTextField().getText());
+        double tauValue = hahnEchoParameters.getTau();
+        double repetitionDelayValue = hahnEchoParameters.getRepetitionDelay();
+        double amplitudeValue = hahnEchoParameters.getAmplitude();
+        double ptsFreqValue = Double.parseDouble(deviceParamsController.getPtsTextField().getText());
+
+        ContParameter ampGain = new ContParameter(ContParameter.AMP_GAIN, "Amp gain (dB)", ampGainValue);
+        ContParameter tau = new ContParameter(ContParameter.TAU, "Tau (us)", tauValue);
+        ContParameter repetitionDelay = new ContParameter(ContParameter.REPETITION_DELAY, "Rep delay (s)", repetitionDelayValue);
+        ContParameter amplitude = new ContParameter(ContParameter.AMPLITUDE, "Amplitude", amplitudeValue);
+        ContParameter ptsFreq = new ContParameter(ContParameter.PTS_FREQ, "PTS Freq (MHz)", ptsFreqValue);
+
         ChoiceBox<ContParameter> parameters = new ChoiceBox<>(FXCollections.observableArrayList(
                 ampGain, tau, repetitionDelay, amplitude, ptsFreq
         ));
@@ -255,7 +262,14 @@ public class MainController implements Initializable {
         Optional<ContExperiment> result = dialog.showAndWait();
 
         // run the experiment with entered parameters
-        result.ifPresent(this::contExperiment);
+        result.ifPresent((contExperiment) -> {
+            try {
+                experiment = contExperiment;
+                contExperiment(contExperiment);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
@@ -263,26 +277,133 @@ public class MainController implements Initializable {
      *
      * @param contExperiment data from continous experiment dialog.
      */
-    private void contExperiment(ContExperiment contExperiment) {
+    private void contExperiment(ContExperiment contExperiment) throws Exception {
 
-        // TODO create Cont Experiment
+        // TODO check if HahnEcho or CPMG...
+        contExperiment.init(hahnEchoParameters, selectedTab); // will set task and pulse
+        contExperiment.setTask(new Task() {
+
+            @Override
+            protected Object call() throws Exception {
+                while (contExperiment.getCurrentStep() <= contExperiment.getIterations()) {
+                    try {
+                        contExperiment.getRadioProcessor().start();
+
+                        contExperiment.incrementCurrentStep(); // TODO check if valid parameter value
+                        Thread.sleep(500);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                        break;
+                    }
+                }
+
+                return null;
+            }
+        });
+
+        // init UI events
+        initPulseEvents(contExperiment.getRadioProcessor().getPulse());
+        initPulseTaskEvents(contExperiment.getTask());
+
+        // set onDone event - update desired parameter when single scan is finished
+        contExperiment.getRadioProcessor().getPulse().onDone = createPulseParameterUpdateEvent(contExperiment);
+        contExperiment.getRadioProcessor().getPulse().onComplete = (sender, value) -> {
+            Platform.runLater(() -> leftStatus.setText("Using " + contExperiment.getParameter().getName() + " value " + contExperiment.getParameterValue()));
+        };
+
+        Thread t = new Thread(contExperiment.getTask());
+
+        t.setDaemon(true);
+        t.start();
+
+        setRunningState();
+    }
+
+    private Invokable<Void> createPulseParameterUpdateEvent(ContExperiment contExperiment) {
         switch (contExperiment.getParameter().getId()) {
             case ContParameter.AMP_GAIN:
-                break;
+                return (sender, value) -> {
+                    int currentValue = Integer.parseInt(deviceParamsController.getAttTextField().getText());
+                    int newValue = (int) (currentValue + contExperiment.getCurrentStep() * contExperiment.getStep());
+
+                    FTDI_Device.INSTANCE.device_set_attenuation(newValue);
+                };
             case ContParameter.AMPLITUDE:
-                break;
+                if (contExperiment.getCurrentStep() == contExperiment.getIterations()) return (sender, value) -> {
+                };
+
+                return (sender, value) -> {
+                    if (sender instanceof HahnEcho) {
+                        HahnEcho hahnEcho = (HahnEcho) sender;
+                        HahnEchoParameters hahnEchoParameters = hahnEcho.getParameters();
+
+                        float newValue = (float) contExperiment.getParameterValue();
+                        hahnEchoParameters.setAmplitude(newValue);
+                    } else if (sender instanceof HahnEchoCYCLOPS) {
+                        HahnEchoCYCLOPS hahnEchoCYCLOPS = (HahnEchoCYCLOPS) sender;
+                        HahnEchoParameters hahnEchoParameters = hahnEchoCYCLOPS.getParameters();
+
+                        float newValue = (float) contExperiment.getParameterValue();
+                        hahnEchoParameters.setAmplitude(newValue);
+                    } else {
+                        // TODO other pulse series..
+                    }
+                };
             case ContParameter.PTS_FREQ:
-                break;
+                return (sender, value) -> {
+                    double newValue = contExperiment.getParameterValue();
+
+                    try {
+                        PTS.setFrequency(newValue);
+                    } catch (PTS.PTSException e) {
+                        e.printStackTrace(); // TODO handle PTSException
+                    }
+                };
             case ContParameter.REPETITION_DELAY:
-                break;
+                return (sender, value) -> {
+                    if (sender instanceof HahnEcho) {
+                        HahnEcho hahnEcho = (HahnEcho) sender;
+                        HahnEchoParameters hahnEchoParameters = hahnEcho.getParameters();
+
+                        double newValue = contExperiment.getParameterValue();
+                        hahnEchoParameters.setRepetitionDelay(newValue);
+                    } else if (sender instanceof HahnEchoCYCLOPS) {
+                        HahnEchoCYCLOPS hahnEchoCYCLOPS = (HahnEchoCYCLOPS) sender;
+                        HahnEchoParameters hahnEchoParameters = hahnEchoCYCLOPS.getParameters();
+
+                        double newValue = contExperiment.getParameterValue();
+                        hahnEchoParameters.setRepetitionDelay(newValue);
+                    } else {
+                        // TODO other pulse series..
+                    }
+                };
             case ContParameter.TAU:
-                break;
+                return (sender, value) -> {
+                    if (sender instanceof HahnEcho) {
+                        HahnEcho hahnEcho = (HahnEcho) sender;
+                        HahnEchoParameters hahnEchoParameters = hahnEcho.getParameters();
+
+                        double newValue = contExperiment.getParameterValue();
+                        hahnEchoParameters.setTau(newValue);
+                    } else if (sender instanceof HahnEchoCYCLOPS) {
+                        HahnEchoCYCLOPS hahnEchoCYCLOPS = (HahnEchoCYCLOPS) sender;
+                        HahnEchoParameters hahnEchoParameters = hahnEchoCYCLOPS.getParameters();
+
+                        double newValue = contExperiment.getParameterValue();
+                        hahnEchoParameters.setTau(newValue);
+                    } else {
+                        // TODO other pulse series..
+                    }
+                };
             default:
                 try {
                     throw new Exception("Invalid experiment parameter");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                return (sender, value) -> {
+                };
         }
     }
 
@@ -327,6 +448,11 @@ public class MainController implements Initializable {
     @FXML
     void handleStop() throws Exception {
         experiment.getTask().setOnSucceeded(event -> setReadyState());
+        experiment.getTask().setOnCancelled(event -> {
+            experiment.getRadioProcessor().stop();
+            setReadyState();
+        });
+        experiment.getTask().cancel();
 
         experiment.getRadioProcessor().stop();
     }
@@ -375,7 +501,14 @@ public class MainController implements Initializable {
 
         pulse.onFetch = updateCharts;
         pulse.onComplete = updateCharts;
-        pulse.onRefresh = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Current scan: " + value));
+        pulse.onRefresh = (sender, value) -> Platform.runLater(() -> {
+            if (experiment instanceof ContExperiment) {
+                ContExperiment contExperiment = (ContExperiment) experiment;
+                leftStatus.setText("Current scan: " + value + ", " + contExperiment.getParameter().getName() + " value: " + (contExperiment.getParameterValue() - contExperiment.getStep()));
+            } else {
+                leftStatus.setText("Current scan: " + value);
+            }
+        });
     }
 
     /**
@@ -480,6 +613,8 @@ public class MainController implements Initializable {
         startButton.setDisable(true);
         stopButton.setDisable(false);
         dataMenu.setDisable(true);
+
+        // TODO disable all parameter inputs when experiment is running
     }
 
     private boolean isScanRunning() {

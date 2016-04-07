@@ -127,6 +127,18 @@ public class DeviceParamsController implements Initializable {
             AlertHelper.showAlert(Alert.AlertType.WARNING, "Invalid input", "Please enter a valid number.");
         }
     }
+
+    public TextField getGainTextField() {
+        return gainTextField;
+    }
+
+    public TextField getAttTextField() {
+        return attTextField;
+    }
+
+    public TextField getPtsTextField() {
+        return ptsTextField;
+    }
 }
 
 enum DeviceStatus {

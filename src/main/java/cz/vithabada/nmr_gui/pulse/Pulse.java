@@ -31,6 +31,12 @@ public abstract class Pulse<T> {
     public Invokable<Void> onError;
 
     /**
+     * Invokes when the experiment is complete.
+     * Same as onComplete, but void - use for some cleanup work.
+     */
+    public Invokable<Void> onDone;
+
+    /**
      * Starts the experiment.
      */
     public abstract void start();

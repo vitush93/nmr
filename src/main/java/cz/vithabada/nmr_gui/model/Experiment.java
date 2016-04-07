@@ -17,12 +17,12 @@ public class Experiment {
     /**
      * RadioProcessor configurator.
      */
-    private RadioProcessor radioProcessor;
+    protected RadioProcessor radioProcessor;
 
     /**
      * Task for the experiment run.
      */
-    private Task task;
+    protected Task task;
 
     public Experiment() {
         this.radioProcessor = new RadioProcessor();

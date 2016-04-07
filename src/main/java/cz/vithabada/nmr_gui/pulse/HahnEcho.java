@@ -194,6 +194,7 @@ public class HahnEcho extends Pulse<Complex[]> {
         synchronized (this) {
             onComplete.invoke(this, data);
             onRefresh.invoke(this, NUMBER_OF_SCANS);
+            onDone.invoke(this, null);
         }
     }
 
@@ -241,5 +242,9 @@ public class HahnEcho extends Pulse<Complex[]> {
         System.arraycopy(data, 0, copy, 0, data.length);
 
         return copy;
+    }
+
+    public HahnEchoParameters getParameters() {
+        return parameters;
     }
 }
