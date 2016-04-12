@@ -7,8 +7,8 @@ import cz.vithabada.nmr_gui.api.SpinAPI;
 /**
  * CYCLOPS-enabled variation of HahnEcho class
  *
- * @see HahnEcho
  * @author Vit Habada
+ * @see HahnEcho
  */
 public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
 
@@ -284,9 +284,9 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         }
 
         synchronized (this) {
-            onComplete.invoke(this, data);
-            onRefresh.invoke(this, NUMBER_OF_SCANS);
-            onDone.invoke(this, null);
+            if (onComplete != null) onComplete.invoke(this, data);
+            if (onRefresh != null) onRefresh.invoke(this, NUMBER_OF_SCANS);
+            if (onDone != null) onDone.invoke(this, null);
         }
     }
 
