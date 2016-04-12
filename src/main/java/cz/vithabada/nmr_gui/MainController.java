@@ -542,6 +542,7 @@ public class MainController implements Initializable {
         setReadyState();
 
         WorkerStateEvent workerStateEvent = (WorkerStateEvent) event;
+        workerStateEvent.getSource().getException().printStackTrace();
         leftStatus.setText("Error has occured during program execution: " + workerStateEvent.getSource().getException().getMessage());
     }
 
@@ -587,11 +588,14 @@ public class MainController implements Initializable {
             Invokable<Complex[]> fftChartUpdate = createChartUpdateEvent(fftChart);
 
             Complex[] transformed = FFT.transform(value);
-            fftChartUpdate.invoke(sender, transformed);
+            Complex[] flippedFFT = FFT.fixFFTdata(transformed);
+            fftChartUpdate.invoke(sender, flippedFFT);
 
             Invokable<Complex[]> modulChartUpdate = createChartUpdateEvent(modulChart);
+
             Complex[] modul = FFT.modul(value);
-            modulChartUpdate.invoke(sender, modul);
+            Complex[] flippedModul = FFT.fixFFTdata(modul);
+            modulChartUpdate.invoke(sender, flippedModul);
         };
     }
 

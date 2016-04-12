@@ -28,6 +28,15 @@ public class FFT {
         return fft.transform(data, TransformType.FORWARD);
     }
 
+    public static Complex[] fixFFTdata(Complex[] transformed) {
+        Complex[] temp = new Complex[transformed.length];
+        for(int i = 0; i < transformed.length; i++) {
+            temp[(transformed.length/2 + i) % transformed.length] = transformed[i % transformed.length];
+        }
+
+        return temp;
+    }
+
     /**
      * Computes the FFT modulus on given data.
      *
