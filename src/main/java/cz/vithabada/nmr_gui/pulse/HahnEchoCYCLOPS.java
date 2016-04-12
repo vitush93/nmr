@@ -276,8 +276,8 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
 
             synchronized (this) {
                 createData(real, imag);
-                onFetch.invoke(this, data);
-                onRefresh.invoke(this, api.pb_scan_count(0));
+                if (onFetch != null) onFetch.invoke(this, data);
+                if (onRefresh != null) onRefresh.invoke(this, api.pb_scan_count(0));
             }
 
             System.out.println("Current Scan: " + api.pb_scan_count(0));
