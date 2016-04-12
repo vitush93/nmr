@@ -45,7 +45,7 @@
                                                     <content>
                                                         <LineChart fx:id="dataChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                             <xAxis>
-                                                                <NumberAxis label="Time" side="BOTTOM" />
+                                                                <NumberAxis label="Time (us)" side="BOTTOM" />
                                                             </xAxis>
                                                             <yAxis>
                                                                 <NumberAxis label="Value" side="LEFT" />
@@ -57,7 +57,7 @@
                                                     <content>
                                                         <LineChart fx:id="fftChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                             <xAxis>
-                                                                <NumberAxis label="Time" side="BOTTOM" />
+                                                                <NumberAxis label="Frequency (MHz)" side="BOTTOM" />
                                                             </xAxis>
                                                             <yAxis>
                                                                 <NumberAxis label="Value" side="LEFT" />
@@ -69,7 +69,7 @@
                                                     <content>
                                                         <LineChart fx:id="modulChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                             <xAxis>
-                                                                <NumberAxis label="Time" side="BOTTOM" />
+                                                                <NumberAxis label="Frequency (MHz)" side="BOTTOM" />
                                                             </xAxis>
                                                             <yAxis>
                                                                 <NumberAxis label="Value" side="LEFT" />
