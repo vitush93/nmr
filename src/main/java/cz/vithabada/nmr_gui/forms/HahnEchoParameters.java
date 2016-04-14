@@ -18,9 +18,9 @@ public class HahnEchoParameters extends Parameters {
      */
     DoubleProperty adcFrequency = new SimpleDoubleProperty(75);
     DoubleProperty spectrometerFrequency = new SimpleDoubleProperty(2);
-    IntegerProperty spectralWidth = new SimpleIntegerProperty(642);
+    IntegerProperty spectralWidth = new SimpleIntegerProperty(1000);
     IntegerProperty numberOfScans = new SimpleIntegerProperty(100);
-    DoubleProperty echoTime = new SimpleDoubleProperty(300);
+    DoubleProperty echoTime = new SimpleDoubleProperty(250);
     DoubleProperty tau = new SimpleDoubleProperty(200);
     IntegerProperty p1Phase = new SimpleIntegerProperty(0);
     IntegerProperty p2Phase = new SimpleIntegerProperty(0);
