@@ -24,6 +24,10 @@ public class Experiment {
      */
     protected Task task;
 
+    protected double spectralWidth;
+
+    protected double echoTime;
+
     public Experiment() {
         this.radioProcessor = new RadioProcessor();
     }
@@ -41,6 +45,8 @@ public class Experiment {
         // create pulse from Parameters
         if (pulseEnum == Pulse.HAHN_ECHO) {
             HahnEchoParameters hahnEchoParameters = (HahnEchoParameters) parameters;
+            spectralWidth = hahnEchoParameters.getSpectralWidth();
+            echoTime = hahnEchoParameters.getEchoTime();
 
             if (hahnEchoParameters.getCyclops()) {
                 pulse = new HahnEchoCYCLOPS(hahnEchoParameters);
@@ -64,6 +70,22 @@ public class Experiment {
                 return null;
             }
         });
+    }
+
+    public double getSpectralWidth() {
+        return spectralWidth;
+    }
+
+    public void setSpectralWidth(double spectralWidth) {
+        this.spectralWidth = spectralWidth;
+    }
+
+    public double getEchoTime() {
+        return echoTime;
+    }
+
+    public void setEchoTime(double echoTime) {
+        this.echoTime = echoTime;
     }
 
     public void setTask(Task task) {

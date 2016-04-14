@@ -20,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -582,6 +583,10 @@ public class MainController implements Initializable {
      */
     private Invokable<Complex[]> createChartUpdateEvent() {
         return (sender, value) -> {
+
+            dataChart.getXAxis().setAutoRanging(false);
+            ((NumberAxis)dataChart.getXAxis()).setUpperBound((experiment.getSpectralWidth() / 1000) * experiment.getEchoTime());
+
             Invokable<Complex[]> dataChartUpdate = createChartUpdateEvent(dataChart);
             dataChartUpdate.invoke(sender, value);
 
