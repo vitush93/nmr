@@ -4,6 +4,7 @@ import cz.vithabada.nmr_gui.libs.PTS;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
@@ -91,7 +92,7 @@ public class DeviceParamsController implements Initializable {
     @FXML
     void setPts() {
         try {
-            double freq = Double.parseDouble(ptsTextField.getText());
+            double freq = getPTSFreq();
 
             try {
                 PTS.setFrequency(freq);
@@ -130,6 +131,10 @@ public class DeviceParamsController implements Initializable {
 
     public TextField getGainTextField() {
         return gainTextField;
+    }
+
+    public double getPTSFreq() throws NumberFormatException {
+        return Double.parseDouble(ptsTextField.getText());
     }
 
     public TextField getAttTextField() {

@@ -26,6 +26,8 @@ public class Experiment {
 
     protected double spectralWidth;
 
+    protected double spectrometerFrequency;
+
     protected double echoTime;
 
     public Experiment() {
@@ -47,6 +49,7 @@ public class Experiment {
             HahnEchoParameters hahnEchoParameters = (HahnEchoParameters) parameters;
             spectralWidth = hahnEchoParameters.getSpectralWidth();
             echoTime = hahnEchoParameters.getEchoTime();
+            spectrometerFrequency = hahnEchoParameters.getSpectrometerFrequency();
 
             if (hahnEchoParameters.getCyclops()) {
                 pulse = new HahnEchoCYCLOPS(hahnEchoParameters);
@@ -86,6 +89,14 @@ public class Experiment {
 
     public void setEchoTime(double echoTime) {
         this.echoTime = echoTime;
+    }
+
+    public double getSpectrometerFrequency() {
+        return spectrometerFrequency;
+    }
+
+    public void setSpectrometerFrequency(double spectrometerFrequency) {
+        this.spectrometerFrequency = spectrometerFrequency;
     }
 
     public void setTask(Task task) {

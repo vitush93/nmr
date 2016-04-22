@@ -552,7 +552,7 @@ public class MainController implements Initializable {
      *
      * @return chart update invokable
      */
-    private Invokable<Complex[]> createChartUpdateEvent(LineChart<Number, Number> lineChart) {
+    private Invokable<Complex[]> createDataChartUpdateEvent(LineChart<Number, Number> lineChart) {
         return (sender, value) -> Platform.runLater(() -> {
             lineChart.getData().clear();
 
@@ -562,11 +562,38 @@ public class MainController implements Initializable {
             real.setName("Real");
             imag.setName("Imaginary");
 
-            for (int i = 0, valueLength = value.length; i < valueLength; i++) { // TODO compute actual X axis
+            for (int i = 0, valueLength = value.length; i < valueLength; i++) {
                 Complex c = value[i];
 
-                real.getData().add(new XYChart.Data<>(i, c.getReal()));
-                imag.getData().add(new XYChart.Data<>(i, c.getImaginary()));
+                real.getData().add(new XYChart.Data<>(experiment.getEchoTime() / valueLength * i, c.getReal()));
+                imag.getData().add(new XYChart.Data<>(experiment.getEchoTime() / valueLength * i, c.getImaginary()));
+            }
+
+            lineChart.getData().add(real);
+            lineChart.getData().add(imag);
+        });
+    }
+
+    /**
+     * Factory for chart update invokable.
+     *
+     * @return chart update invokable
+     */
+    private Invokable<Complex[]> createFFTChartUpdateEvent(LineChart<Number, Number> lineChart) {
+        return (sender, value) -> Platform.runLater(() -> {
+            lineChart.getData().clear();
+
+            final XYChart.Series<Number, Number> real = new XYChart.Series<>();
+            final XYChart.Series<Number, Number> imag = new XYChart.Series<>();
+
+            real.setName("Real");
+            imag.setName("Imaginary");
+
+            for (int i = 0, valueLength = value.length; i < valueLength; i++) {
+                Complex c = value[i];
+
+                real.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth()/2000, c.getReal()));
+                imag.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth()/2000, c.getImaginary()));
             }
 
             lineChart.getData().add(real);
@@ -585,18 +612,30 @@ public class MainController implements Initializable {
         return (sender, value) -> {
 
             dataChart.getXAxis().setAutoRanging(false);
-            ((NumberAxis)dataChart.getXAxis()).setUpperBound((experiment.getSpectralWidth() / 1000) * experiment.getEchoTime());
+            ((NumberAxis) dataChart.getXAxis()).setLowerBound(0);
+            ((NumberAxis) dataChart.getXAxis()).setUpperBound(experiment.getEchoTime());
 
-            Invokable<Complex[]> dataChartUpdate = createChartUpdateEvent(dataChart);
+            Invokable<Complex[]> dataChartUpdate = createDataChartUpdateEvent(dataChart);
             dataChartUpdate.invoke(sender, value);
 
-            Invokable<Complex[]> fftChartUpdate = createChartUpdateEvent(fftChart);
+            double left = deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth() / 2000;
+            double right = deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() + experiment.getSpectralWidth() / 2000;
+
+            fftChart.getXAxis().setAutoRanging(false);
+            ((NumberAxis) fftChart.getXAxis()).setLowerBound(left);
+            ((NumberAxis) fftChart.getXAxis()).setUpperBound(right);
+            ((NumberAxis) fftChart.getXAxis()).setTickUnit(0.1);
+            Invokable<Complex[]> fftChartUpdate = createFFTChartUpdateEvent(fftChart);
 
             Complex[] transformed = FFT.transform(value);
             Complex[] flippedFFT = FFT.fixFFTdata(transformed);
             fftChartUpdate.invoke(sender, flippedFFT);
 
-            Invokable<Complex[]> modulChartUpdate = createChartUpdateEvent(modulChart);
+            modulChart.getXAxis().setAutoRanging(false);
+            ((NumberAxis) modulChart.getXAxis()).setLowerBound(left);
+            ((NumberAxis) modulChart.getXAxis()).setUpperBound(right);
+            ((NumberAxis) modulChart.getXAxis()).setTickUnit(0.1);
+            Invokable<Complex[]> modulChartUpdate = createFFTChartUpdateEvent(modulChart);
 
             Complex[] modul = FFT.modul(value);
             Complex[] flippedModul = FFT.fixFFTdata(modul);
