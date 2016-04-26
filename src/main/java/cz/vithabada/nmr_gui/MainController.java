@@ -553,6 +553,14 @@ public class MainController implements Initializable {
      * @return chart update invokable
      */
     private Invokable<Complex[]> createDataChartUpdateEvent(LineChart<Number, Number> lineChart) {
+        String[] parts = leftStatus.getText().replaceAll("\\s+", "").split("(,)|(:)");
+
+        int num_scans = 1;
+        if (parts.length >= 2) {
+            num_scans = Integer.parseInt(parts[1]);
+        }
+
+        final int finalNum_scans1 = num_scans;
         return (sender, value) -> Platform.runLater(() -> {
             lineChart.getData().clear();
 
@@ -565,8 +573,8 @@ public class MainController implements Initializable {
             for (int i = 0, valueLength = value.length; i < valueLength; i++) {
                 Complex c = value[i];
 
-                real.getData().add(new XYChart.Data<>(experiment.getEchoTime() / valueLength * i, c.getReal()));
-                imag.getData().add(new XYChart.Data<>(experiment.getEchoTime() / valueLength * i, c.getImaginary()));
+                real.getData().add(new XYChart.Data<>(experiment.getEchoTime() / valueLength * i, c.getReal() / finalNum_scans1));
+                imag.getData().add(new XYChart.Data<>(experiment.getEchoTime() / valueLength * i, c.getImaginary() / finalNum_scans1));
             }
 
             lineChart.getData().add(real);
@@ -580,6 +588,14 @@ public class MainController implements Initializable {
      * @return chart update invokable
      */
     private Invokable<Complex[]> createFFTChartUpdateEvent(LineChart<Number, Number> lineChart) {
+        String[] parts = leftStatus.getText().replaceAll("\\s+", "").split("(,)|(:)");
+
+        int num_scans = 1;
+        if (parts.length >= 2) {
+            num_scans = Integer.parseInt(parts[1]);
+        }
+
+        final int finalNum_scans1 = num_scans;
         return (sender, value) -> Platform.runLater(() -> {
             lineChart.getData().clear();
 
@@ -592,8 +608,8 @@ public class MainController implements Initializable {
             for (int i = 0, valueLength = value.length; i < valueLength; i++) {
                 Complex c = value[i];
 
-                real.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth()/2000, c.getReal()));
-                imag.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth()/2000, c.getImaginary()));
+                real.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth() / 2000, c.getReal() / finalNum_scans1));
+                imag.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth() / 2000, c.getImaginary() / finalNum_scans1));
             }
 
             lineChart.getData().add(real);
