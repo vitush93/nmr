@@ -30,8 +30,8 @@ public class FFT {
 
     public static Complex[] fixFFTdata(Complex[] transformed) {
         Complex[] temp = new Complex[transformed.length];
-        for(int i = 0; i < transformed.length; i++) {
-            temp[(transformed.length/2 + i) % transformed.length] = transformed[i % transformed.length];
+        for (int i = 0; i < transformed.length; i++) {
+            temp[(transformed.length / 2 + i) % transformed.length] = transformed[i % transformed.length];
         }
 
         return temp;
@@ -43,7 +43,7 @@ public class FFT {
      * @param data data to transform.
      * @return transformed data.
      */
-    public static Complex[] modul(Complex[] data) {
+    public static Complex[] modulFFT(Complex[] data) {
         if ((data.length & (data.length - 1)) != 0) {
             data = pad(data);
         }
@@ -51,13 +51,62 @@ public class FFT {
         FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);
         Complex[] transformed = fft.transform(data, TransformType.FORWARD);
 
+        return modul(transformed);
+    }
+
+    public static Complex[] modul(Complex[] data) {
         Complex[] arr = new Complex[data.length];
 
         for (int i = 0; i < data.length; i++) {
-            double re = transformed[i].getReal();
-            double im = transformed[i].getImaginary();
+            double re = data[i].getReal();
+            double im = data[i].getImaginary();
 
-            arr[i] = new Complex(Math.sqrt(re*re + im*im));
+            arr[i] = new Complex(Math.sqrt(re * re + im * im));
+        }
+
+        return arr;
+    }
+
+    public static double dataMax(Complex[] data) {
+        if (data.length == 0) {
+            throw new RuntimeException("Provided data set is empty");
+        }
+        double modul_max = Double.MIN_VALUE;
+        for (Complex c : data) {
+            if (c.getReal() > modul_max) {
+                modul_max = c.getReal();
+            }
+        }
+
+        return modul_max;
+    }
+
+    public static double dataIntegral(Complex[] data) {
+        double modul_int = 0;
+        for (Complex c : data) {
+            modul_int += c.getReal();
+        }
+
+        return modul_int;
+    }
+
+    public static double[] extractReal(Complex[] data) {
+        return extract(data, true);
+    }
+
+    public static double[] extractImaginary(Complex[] data) {
+        return extract(data, false);
+    }
+
+    private static double[] extract(Complex[] data, boolean real) {
+        double[] arr = new double[data.length];
+        for (int i = 0; i < data.length; i++) {
+            Complex c = data[i];
+            if (real) {
+                arr[i] = c.getReal();
+            } else {
+                arr[i] = c.getImaginary();
+            }
         }
 
         return arr;

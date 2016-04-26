@@ -63,6 +63,9 @@ public class MainController implements Initializable {
     TabPane pulseTab;
 
     @FXML
+    Tab statsPlot;
+
+    @FXML
     GridPane deviceParams;
 
     @FXML
@@ -85,6 +88,9 @@ public class MainController implements Initializable {
 
     @FXML
     LineChart<Number, Number> modulChart;
+
+    @FXML
+    LineChart<Number, Number> statsChart;
 
     @FXML
     Button startButton;
@@ -280,6 +286,11 @@ public class MainController implements Initializable {
      */
     private void contExperiment(ContExperiment contExperiment) throws Exception {
 
+        statsChart.getXAxis().setAutoRanging(false);
+        ((NumberAxis)statsChart.getXAxis()).setLowerBound(1);
+        ((NumberAxis)statsChart.getXAxis()).setUpperBound(contExperiment.getIterations());
+        ((NumberAxis)statsChart.getXAxis()).setTickUnit(1);
+
         // TODO check if HahnEcho or CPMG...
         contExperiment.init(hahnEchoParameters, selectedTab); // will set task and pulse
         contExperiment.setTask(new Task() {
@@ -289,6 +300,7 @@ public class MainController implements Initializable {
                 while (contExperiment.getCurrentStep() <= contExperiment.getIterations()) {
                     try {
                         contExperiment.getRadioProcessor().start();
+                        contExperiment.onScan.invoke(this, contExperiment.getRadioProcessor().getData());
 
                         contExperiment.incrementCurrentStep(); // TODO check if valid parameter value
                         Thread.sleep(500);
@@ -312,6 +324,8 @@ public class MainController implements Initializable {
         contExperiment.getRadioProcessor().getPulse().onComplete = (sender, value) -> {
             Platform.runLater(() -> leftStatus.setText("Using " + contExperiment.getParameter().getName() + " value " + contExperiment.getParameterValue()));
         };
+        contExperiment.onScan = createStatsChartUpdateEvent(statsChart);
+        statsPlot.setDisable(false);
 
         Thread t = new Thread(contExperiment.getTask());
 
@@ -617,6 +631,67 @@ public class MainController implements Initializable {
         });
     }
 
+    private Invokable<Complex[]> createStatsChartUpdateEvent(LineChart<Number, Number> lineChart) {
+        return (sender, value) -> Platform.runLater(() -> {
+            ContExperiment contExperiment = (ContExperiment) experiment;
+            Complex[] data = contExperiment.getRadioProcessor().getPulse().getData();
+
+            Complex[] modulFFT = FFT.modulFFT(data);
+            Complex[] modul = FFT.modul(data);
+
+            double modulMax = FFT.dataMax(modul);
+            double modulFFTMax = FFT.dataMax(modulFFT);
+            double modulInt = FFT.dataIntegral(modul);
+            double modulFFTInt = FFT.dataIntegral(modulFFT);
+
+            final XYChart.Series<Number, Number> modulMaxSeries;
+            final XYChart.Series<Number, Number> modulFFTMaxSeries;
+            final XYChart.Series<Number, Number> modulIntSeries;
+            final XYChart.Series<Number, Number> modulFFTIntSeries;
+
+            if (lineChart.getData().size() == 0) {
+                modulMaxSeries = new XYChart.Series<>();
+                modulFFTMaxSeries = new XYChart.Series<>();
+                modulIntSeries = new XYChart.Series<>();
+                modulFFTIntSeries = new XYChart.Series<>();
+
+                modulMaxSeries.setName("Mod Max");
+                modulFFTMaxSeries.setName("FFT Mod Max");
+                modulIntSeries.setName("Mod Integral");
+                modulFFTIntSeries.setName("FFT Mod Integral");
+
+                modulMaxSeries.getData().add(new XYChart.Data<>(1, modulMax));
+                modulFFTMaxSeries.getData().add(new XYChart.Data<>(1, modulFFTMax));
+                modulIntSeries.getData().add(new XYChart.Data<>(1, modulInt));
+                modulFFTIntSeries.getData().add(new XYChart.Data<>(1, modulFFTInt));
+
+                lineChart.getData().add(modulMaxSeries);
+                lineChart.getData().add(modulFFTMaxSeries);
+                lineChart.getData().add(modulIntSeries);
+                lineChart.getData().add(modulFFTIntSeries);
+            } else {
+                int x = lineChart.getData().get(0).getData().size() + 1;
+                for (XYChart.Series<Number, Number> series : lineChart.getData()) {
+                    String seriesName = series.getName();
+                    switch (seriesName) {
+                        case "Mod Max":
+                            series.getData().add(new XYChart.Data<>(x, modulMax));
+                            break;
+                        case "FFT Mod Max":
+                            series.getData().add(new XYChart.Data<>(x, modulFFTMax));
+                            break;
+                        case "Mod Integral":
+                            series.getData().add(new XYChart.Data<>(x, modulInt));
+                            break;
+                        case "FFT Mod Integral":
+                            series.getData().add(new XYChart.Data<>(x, modulFFTInt));
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
     /**
      * Factory for chart update invokable.
      * Wraps the createChartUpdateEvent(LineChart).
@@ -653,7 +728,7 @@ public class MainController implements Initializable {
             ((NumberAxis) modulChart.getXAxis()).setTickUnit(0.1);
             Invokable<Complex[]> modulChartUpdate = createFFTChartUpdateEvent(modulChart);
 
-            Complex[] modul = FFT.modul(value);
+            Complex[] modul = FFT.modulFFT(value);
             Complex[] flippedModul = FFT.fixFFTdata(modul);
             modulChartUpdate.invoke(sender, flippedModul);
         };

@@ -124,13 +124,7 @@ public class ContExperiment extends Experiment {
             protected Object call() throws Exception {
                 onScanStart.invoke(ContExperiment.this, null);
 
-                radioProcessor.getPulse().onComplete = new Invokable<Complex[]>() {
-
-                    @Override
-                    public void invoke(Object sender, Complex[] value) {
-
-                    }
-                };
+                radioProcessor.getPulse().onComplete = onScan;
 
                 radioProcessor.getPulse().start();
 
