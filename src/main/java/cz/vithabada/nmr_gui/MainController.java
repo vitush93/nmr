@@ -287,9 +287,9 @@ public class MainController implements Initializable {
     private void contExperiment(ContExperiment contExperiment) throws Exception {
 
         statsChart.getXAxis().setAutoRanging(false);
-        ((NumberAxis)statsChart.getXAxis()).setLowerBound(1);
-        ((NumberAxis)statsChart.getXAxis()).setUpperBound(contExperiment.getIterations());
-        ((NumberAxis)statsChart.getXAxis()).setTickUnit(1);
+        ((NumberAxis) statsChart.getXAxis()).setLowerBound(1);
+        ((NumberAxis) statsChart.getXAxis()).setUpperBound(contExperiment.getIterations());
+        ((NumberAxis) statsChart.getXAxis()).setTickUnit(1);
 
         // TODO check if HahnEcho or CPMG...
         contExperiment.init(hahnEchoParameters, selectedTab); // will set task and pulse
@@ -452,7 +452,7 @@ public class MainController implements Initializable {
 
             // write to file
             PlainTextData plainTextData = new PlainTextData(experiment.getRadioProcessor().getData());
-            plainTextData.toFile(file);
+            plainTextData.toFile(hahnEchoParameters, file); // TODO change parameters accordingly
         }
     }
 
@@ -639,16 +639,23 @@ public class MainController implements Initializable {
             Complex[] modulFFT = FFT.modulFFT(data);
             Complex[] modul = FFT.modul(data);
 
+            double left = deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth() / 2000;
+            double right = deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() + experiment.getSpectralWidth() / 2000;
+
+            int fftPointIndex = data.length / 2;
+
             double modulMax = FFT.dataMax(modul);
             double modulFFTMax = FFT.dataMax(modulFFT);
             double modulInt = FFT.dataIntegral(modul);
             double modulFFTInt = FFT.dataIntegral(modulFFT);
+            double fftValue = modulFFT[fftPointIndex].getReal();
 
             final XYChart.Series<Number, Number> modulMaxSeries;
             final XYChart.Series<Number, Number> modulFFTMaxSeries;
             final XYChart.Series<Number, Number> modulIntSeries;
             final XYChart.Series<Number, Number> modulFFTIntSeries;
 
+            String fftSeriesName = "FFT Mod at " + (deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency()) + "MHz";
             if (lineChart.getData().size() == 0) {
                 modulMaxSeries = new XYChart.Series<>();
                 modulFFTMaxSeries = new XYChart.Series<>();
@@ -658,12 +665,12 @@ public class MainController implements Initializable {
                 modulMaxSeries.setName("Mod Max");
                 modulFFTMaxSeries.setName("FFT Mod Max");
                 modulIntSeries.setName("Mod Integral");
-                modulFFTIntSeries.setName("FFT Mod Integral");
+                modulFFTIntSeries.setName(fftSeriesName);
 
                 modulMaxSeries.getData().add(new XYChart.Data<>(1, modulMax));
                 modulFFTMaxSeries.getData().add(new XYChart.Data<>(1, modulFFTMax));
                 modulIntSeries.getData().add(new XYChart.Data<>(1, modulInt));
-                modulFFTIntSeries.getData().add(new XYChart.Data<>(1, modulFFTInt));
+                modulFFTIntSeries.getData().add(new XYChart.Data<>(1, fftValue));
 
                 lineChart.getData().add(modulMaxSeries);
                 lineChart.getData().add(modulFFTMaxSeries);
@@ -673,19 +680,14 @@ public class MainController implements Initializable {
                 int x = lineChart.getData().get(0).getData().size() + 1;
                 for (XYChart.Series<Number, Number> series : lineChart.getData()) {
                     String seriesName = series.getName();
-                    switch (seriesName) {
-                        case "Mod Max":
-                            series.getData().add(new XYChart.Data<>(x, modulMax));
-                            break;
-                        case "FFT Mod Max":
-                            series.getData().add(new XYChart.Data<>(x, modulFFTMax));
-                            break;
-                        case "Mod Integral":
-                            series.getData().add(new XYChart.Data<>(x, modulInt));
-                            break;
-                        case "FFT Mod Integral":
-                            series.getData().add(new XYChart.Data<>(x, modulFFTInt));
-                            break;
+                    if (seriesName.equals("Mod Max")) {
+                        series.getData().add(new XYChart.Data<>(x, modulMax));
+                    } else if (seriesName.equals("FFT Mod Max")) {
+                        series.getData().add(new XYChart.Data<>(x, modulFFTMax));
+                    } else if (seriesName.equals("Mod Integral")) {
+                        series.getData().add(new XYChart.Data<>(x, modulInt));
+                    } else if (seriesName.equals(fftSeriesName)) {
+                        series.getData().add(new XYChart.Data<>(x, fftValue));
                     }
                 }
             }

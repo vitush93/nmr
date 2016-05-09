@@ -1,6 +1,7 @@
 package cz.vithabada.nmr_gui.model;
 
 
+import cz.vithabada.nmr_gui.forms.Parameters;
 import org.apache.commons.math3.complex.Complex;
 
 import java.io.File;
@@ -44,9 +45,11 @@ public class PlainTextData {
      *
      * @param file File to be saved.
      */
-    public void toFile(File file) {
+    public void toFile(Parameters parameters, File file) {
         try {
             PrintWriter pw = new PrintWriter(file);
+            pw.print(parameters);
+            pw.print("\n\n");
             pw.print(this.toString());
             pw.close();
         } catch (FileNotFoundException e) {

@@ -4,6 +4,7 @@ import javafx.beans.property.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.lang.reflect.Field;
 
 /**
  * Container class for HahnEcho pulse parameters.
@@ -214,5 +215,19 @@ public class HahnEchoParameters extends Parameters {
 
     public void setRepetitionDelay(double repetitionDelay) {
         this.repetitionDelay.set(repetitionDelay);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Field f : this.getClass().getDeclaredFields()) {
+            try {
+                sb.append(f.getName()).append(" = ").append(f.get(this)).append("\n");
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return sb.toString();
     }
 }
