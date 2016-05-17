@@ -79,6 +79,7 @@ public class HahnEchoCYCLOPS extends Pulse<Complex[]> {
         double ringdown_time = TAU - 0.5 * ECHO_TIME;
 
         int num_points = (int) Math.floor(((ECHO_TIME) / 1e6) * actualSpectralWidth);
+        System.out.println("Num points: " + num_points);
 
         synchronized (this) {
             this.data = new Complex[num_points];

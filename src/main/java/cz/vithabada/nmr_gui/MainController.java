@@ -66,6 +66,9 @@ public class MainController implements Initializable {
     Tab statsPlot;
 
     @FXML
+    Tab modPlot;
+
+    @FXML
     GridPane deviceParams;
 
     @FXML
@@ -91,6 +94,9 @@ public class MainController implements Initializable {
 
     @FXML
     LineChart<Number, Number> statsChart;
+
+    @FXML
+    LineChart<Number, Number> modChart;
 
     @FXML
     Button startButton;
@@ -321,11 +327,16 @@ public class MainController implements Initializable {
 
         // set onDone event - update desired parameter when single scan is finished
         contExperiment.getRadioProcessor().getPulse().onDone = createPulseParameterUpdateEvent(contExperiment);
-        contExperiment.getRadioProcessor().getPulse().onComplete = (sender, value) -> {
-            Platform.runLater(() -> leftStatus.setText("Using " + contExperiment.getParameter().getName() + " value " + contExperiment.getParameterValue()));
-        };
-        contExperiment.onScan = createStatsChartUpdateEvent(statsChart);
+        contExperiment.getRadioProcessor().getPulse().onComplete = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Using " + contExperiment.getParameter().getName() + " value " + contExperiment.getParameterValue()));
+
+        // prepare cont experiment plots
         statsPlot.setDisable(false);
+        if (contExperiment.getParameter().getId() == ContParameter.PTS_FREQ) {
+            modPlot.setDisable(false);
+            contExperiment.onScan = statsModChartUpdate();
+        } else {
+            contExperiment.onScan = createStatsChartUpdateEvent(statsChart);
+        }
 
         Thread t = new Thread(contExperiment.getTask());
 
@@ -333,6 +344,16 @@ public class MainController implements Initializable {
         t.start();
 
         setRunningState();
+    }
+
+    private Invokable<Complex[]> statsModChartUpdate() {
+        return (sender, value) -> {
+            Invokable<Complex[]> statsChartUpdate = createStatsChartUpdateEvent(statsChart);
+            statsChartUpdate.invoke(sender, value);
+
+            Invokable<Complex[]> modChartUpdate = createModChartUpdateEvent(modChart);
+            modChartUpdate.invoke(sender, value);
+        };
     }
 
     private Invokable<Void> createPulseParameterUpdateEvent(ContExperiment contExperiment) {
@@ -629,6 +650,26 @@ public class MainController implements Initializable {
             lineChart.getData().add(real);
             lineChart.getData().add(imag);
         });
+    }
+
+    private Invokable<Complex[]> createModChartUpdateEvent(LineChart<Number, Number> lineChart) {
+        return (sender, value) -> {
+
+            // compute FFT modulus
+            ContExperiment contExperiment = (ContExperiment) experiment;
+            Complex[] fftMod = FFT.modulFFT(contExperiment.getRadioProcessor().getPulse().getData());
+
+            // plot data
+            final XYChart.Series<Number, Number> dataSeries;
+            if (lineChart.getData().size() == 0) { // no data series present
+                dataSeries = new XYChart.Series<>();
+                dataSeries.setName("Data");
+
+                // TODO add data to chart
+            } else {
+
+            }
+        };
     }
 
     private Invokable<Complex[]> createStatsChartUpdateEvent(LineChart<Number, Number> lineChart) {
