@@ -305,7 +305,7 @@ public class MainController implements Initializable {
 
             @Override
             protected Object call() throws Exception {
-                while (contExperiment.getCurrentStep() <= contExperiment.getIterations()) {
+                while (contExperiment.getCurrentIteration() <= contExperiment.getIterations()) {
                     try {
                         contExperiment.getRadioProcessor().start();
                         contExperiment.onScan.invoke(this, contExperiment.getRadioProcessor().getData());
@@ -363,12 +363,12 @@ public class MainController implements Initializable {
             case ContParameter.AMP_GAIN:
                 return (sender, value) -> {
                     int currentValue = Integer.parseInt(deviceParamsController.getAttTextField().getText());
-                    int newValue = (int) (currentValue + contExperiment.getCurrentStep() * contExperiment.getStep());
+                    int newValue = (int) (currentValue + contExperiment.getCurrentIteration() * contExperiment.getStep());
 
                     FTDI_Device.INSTANCE.device_set_attenuation(newValue);
                 };
             case ContParameter.AMPLITUDE:
-                if (contExperiment.getCurrentStep() == contExperiment.getIterations()) return (sender, value) -> {
+                if (contExperiment.getCurrentIteration() == contExperiment.getIterations()) return (sender, value) -> {
                 };
 
                 return (sender, value) -> {

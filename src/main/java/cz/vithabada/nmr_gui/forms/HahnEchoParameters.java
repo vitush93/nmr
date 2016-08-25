@@ -33,6 +33,16 @@ public class HahnEchoParameters extends Parameters {
     DoubleProperty repetitionDelay = new SimpleDoubleProperty(0.1);
     BooleanProperty cyclops = new SimpleBooleanProperty(false);
 
+    int numPoints;
+
+    public int getNumPoints() {
+        return numPoints;
+    }
+
+    public void setNumPoints(int numPoints) {
+        this.numPoints = numPoints;
+    }
+
     public boolean getCyclops() {
         return cyclops.get();
     }

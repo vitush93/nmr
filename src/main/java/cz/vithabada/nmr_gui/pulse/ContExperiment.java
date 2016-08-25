@@ -1,10 +1,8 @@
 package cz.vithabada.nmr_gui.pulse;
 
-import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.libs.Invokable;
 import cz.vithabada.nmr_gui.model.Experiment;
 import javafx.concurrent.Task;
-import org.apache.commons.javaflow.Continuation;
 import org.apache.commons.math3.complex.Complex;
 
 import java.util.List;
@@ -55,7 +53,7 @@ public class ContExperiment extends Experiment {
     /**
      *
      */
-    private int currentStep = 1;
+    private int currentIteration = 1;
 
     /**
      * Collected data from all scans.
@@ -73,12 +71,12 @@ public class ContExperiment extends Experiment {
         this.iterations = i;
     }
 
-    public int getCurrentStep() {
-        return currentStep;
+    public int getCurrentIteration() {
+        return currentIteration;
     }
 
     public void incrementCurrentStep() {
-        currentStep++;
+        currentIteration++;
     }
 
     public ContParameter getParameter() {
@@ -110,7 +108,7 @@ public class ContExperiment extends Experiment {
     }
 
     public double getParameterValue() {
-        return parameter.getInitialValue() + step * currentStep;
+        return parameter.getInitialValue() + step * currentIteration;
     }
 
     /**
