@@ -181,6 +181,8 @@ public class MainController implements Initializable {
     @FXML
     void handleContButton(ActionEvent actionEvent) {
 
+        if (!checkRadioProcessor()) return;
+
         // Create the custom dialog.
         Dialog<ContExperiment> dialog = new Dialog<>();
         dialog.setTitle("Experiment dialog");
