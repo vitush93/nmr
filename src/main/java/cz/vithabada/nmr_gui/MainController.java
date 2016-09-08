@@ -5,6 +5,7 @@ import cz.vithabada.nmr_gui.api.FTDI_Device;
 import cz.vithabada.nmr_gui.forms.FormFactory;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.libs.PTS;
+import cz.vithabada.nmr_gui.model.PTSChartViewModel;
 import cz.vithabada.nmr_gui.pulse.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -59,6 +60,11 @@ public class MainController implements Initializable {
      */
     private Experiment experiment;
 
+    /**
+     *
+     */
+    private PTSChartViewModel ptsChartViewModel;
+
     @FXML
     TabPane pulseTab;
 
@@ -96,7 +102,7 @@ public class MainController implements Initializable {
     LineChart<Number, Number> statsChart;
 
     @FXML
-    LineChart<Number, Number> modChart;
+    LineChart<Number, Number> spectrumChart;
 
     @FXML
     Button startButton;
@@ -334,8 +340,20 @@ public class MainController implements Initializable {
         // prepare cont experiment plots
         statsPlot.setDisable(false);
         if (contExperiment.getParameter().getId() == ContParameter.PTS_FREQ) {
+            spectrumChart.getData().clear();
+            spectrumChart.setDisable(false);
+            spectrumChart.getXAxis().setAutoRanging(false);
             modPlot.setDisable(false);
-            contExperiment.onScan = statsModChartUpdate();
+
+            double ptsFreq = contExperiment.getParameter().getInitialValue();
+            double swMHZ = (double)hahnEchoParameters.getSpectralWidth() / 1000;
+            ((NumberAxis) spectrumChart.getXAxis()).setLowerBound(ptsFreq - swMHZ/2);
+            ((NumberAxis) spectrumChart.getXAxis()).setUpperBound(ptsFreq + contExperiment.getIterations()*contExperiment.getStep() + swMHZ/2);
+            ((NumberAxis) spectrumChart.getXAxis()).setTickUnit(0.1);
+
+            ptsChartViewModel = new PTSChartViewModel(contExperiment, hahnEchoParameters, spectrumChart);
+
+            contExperiment.onScan = spectrumChartUpdate();
         } else {
             contExperiment.onScan = createStatsChartUpdateEvent(statsChart);
         }
@@ -348,13 +366,14 @@ public class MainController implements Initializable {
         setRunningState();
     }
 
-    private Invokable<Complex[]> statsModChartUpdate() {
+    private Invokable<Complex[]> spectrumChartUpdate() {
         return (sender, value) -> {
+            System.out.println("Spectrum update running!");
+
+            ptsChartViewModel.addData(((ContExperiment) experiment).getParameterValue(), value);
+
             Invokable<Complex[]> statsChartUpdate = createStatsChartUpdateEvent(statsChart);
             statsChartUpdate.invoke(sender, value);
-
-            Invokable<Complex[]> modChartUpdate = createModChartUpdateEvent(modChart);
-            modChartUpdate.invoke(sender, value);
         };
     }
 
@@ -654,6 +673,11 @@ public class MainController implements Initializable {
         });
     }
 
+    /**
+     * @param lineChart
+     * @return
+     * @deprecated
+     */
     private Invokable<Complex[]> createModChartUpdateEvent(LineChart<Number, Number> lineChart) {
         return (sender, value) -> {
 

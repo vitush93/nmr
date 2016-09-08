@@ -91,7 +91,7 @@
                                                 </Tab>
                                                 <Tab disable="true" fx:id="modPlot" closable="false" text="Spectrum">
                                                     <content>
-                                                        <LineChart fx:id="modChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                        <LineChart fx:id="spectrumChart" animated="false" createSymbols="false" layoutX="70.0" layoutY="76.0" title="Data Plot" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                             <xAxis>
                                                                 <NumberAxis label="Experiment" side="BOTTOM" />
                                                             </xAxis>

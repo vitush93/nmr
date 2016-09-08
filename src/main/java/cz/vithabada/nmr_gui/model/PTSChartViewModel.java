@@ -3,6 +3,7 @@ package cz.vithabada.nmr_gui.model;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.libs.FFT;
 import cz.vithabada.nmr_gui.pulse.ContExperiment;
+import javafx.application.Platform;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import org.apache.commons.math3.complex.Complex;
@@ -35,7 +36,7 @@ public class PTSChartViewModel {
 
         final XYChart.Series<Number, Number> modul = new XYChart.Series<>();
         double[] pointFrequencies = new double[mod.length];
-        double deltaF = this.hahnEchoParameters.getSpectralWidth() / this.hahnEchoParameters.getNumPoints();
+        double deltaF = (double) (this.hahnEchoParameters.getSpectralWidth() / this.hahnEchoParameters.getNumPoints()) / 1000;
 
         int initialIndex;
         if (mod.length % 2 == 0) {
@@ -47,13 +48,21 @@ public class PTSChartViewModel {
         pointFrequencies[initialIndex] = ptsFreq;
 
         int index = initialIndex - 1;
-        while (index > 0) {
-            pointFrequencies[index--] = ptsFreq - deltaF;
+        for (int i = 1; i < mod.length; i++) {
+            if (index < 0) break;
+
+            pointFrequencies[index--] = ptsFreq - (i * deltaF);
         }
 
+//        index = initialIndex;
+//        while (index < mod.length) {
+//            pointFrequencies[index++] = ptsFreq + index * deltaF;
+//        }
         index = initialIndex + 1;
-        while (index < mod.length) {
-            pointFrequencies[index++] = ptsFreq + deltaF;
+        for (int i = 1; i < mod.length; i++) {
+            if (index >= mod.length) break;
+
+            pointFrequencies[index++] = ptsFreq + (i * deltaF);
         }
 
         for (int i = 0; i < mod.length; i++) {
@@ -63,7 +72,7 @@ public class PTSChartViewModel {
             ));
         }
 
-        this.lineChart.getData().add(modul);
+        Platform.runLater(() -> this.lineChart.getData().add(modul));
     }
 
 }
