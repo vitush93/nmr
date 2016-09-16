@@ -8,7 +8,11 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import org.apache.commons.math3.complex.Complex;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class PTSChartViewModel {
 
@@ -23,11 +27,17 @@ public class PTSChartViewModel {
     private LineChart<Number, Number> lineChart;
     private HahnEchoParameters hahnEchoParameters;
     private ContExperiment contExperiment;
+    private XYChart.Series<Number, Number> spectrumSeries;
+    private SortedMap<Number, Number> spectrumMap = new TreeMap<>();
+    private boolean spectrumSeriesAdded = false;
 
     public PTSChartViewModel(ContExperiment contExperiment, HahnEchoParameters hahnEchoParameters, LineChart<Number, Number> chart) {
         this.lineChart = chart;
         this.contExperiment = contExperiment;
         this.hahnEchoParameters = hahnEchoParameters;
+
+        this.spectrumSeries = new XYChart.Series<>();
+        this.spectrumSeries.setName("Spectrum");
     }
 
     public void addData(double ptsFreq, Complex[] data) {
@@ -35,6 +45,10 @@ public class PTSChartViewModel {
         this.dataSet.put(ptsFreq, mod);
 
         final XYChart.Series<Number, Number> modul = new XYChart.Series<>();
+        DecimalFormat df = new DecimalFormat("#.####");
+        df.setRoundingMode(RoundingMode.CEILING);
+
+        modul.setName(df.format(ptsFreq) + " MHz");
         double[] pointFrequencies = new double[mod.length];
         double deltaF = (double) (this.hahnEchoParameters.getSpectralWidth() / this.hahnEchoParameters.getNumPoints()) / 1000;
 
@@ -54,10 +68,6 @@ public class PTSChartViewModel {
             pointFrequencies[index--] = ptsFreq - (i * deltaF);
         }
 
-//        index = initialIndex;
-//        while (index < mod.length) {
-//            pointFrequencies[index++] = ptsFreq + index * deltaF;
-//        }
         index = initialIndex + 1;
         for (int i = 1; i < mod.length; i++) {
             if (index >= mod.length) break;

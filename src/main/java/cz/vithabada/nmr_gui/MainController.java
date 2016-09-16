@@ -301,9 +301,9 @@ public class MainController implements Initializable {
     private void contExperiment(ContExperiment contExperiment) throws Exception {
 
         statsChart.getXAxis().setAutoRanging(false);
-        ((NumberAxis) statsChart.getXAxis()).setLowerBound(1);
-        ((NumberAxis) statsChart.getXAxis()).setUpperBound(contExperiment.getIterations());
-        ((NumberAxis) statsChart.getXAxis()).setTickUnit(1);
+        ((NumberAxis) statsChart.getXAxis()).setLowerBound(contExperiment.getParameter().getInitialValue());
+        ((NumberAxis) statsChart.getXAxis()).setUpperBound(contExperiment.getParameter().getInitialValue() + contExperiment.getStep() * contExperiment.getIterations());
+        ((NumberAxis) statsChart.getXAxis()).setTickUnit(contExperiment.getStep());
 
         // TODO check if HahnEcho or CPMG...
         contExperiment.init(hahnEchoParameters, selectedTab); // will set task and pulse
@@ -311,7 +311,7 @@ public class MainController implements Initializable {
 
             @Override
             protected Object call() throws Exception {
-                while (contExperiment.getCurrentIteration() <= contExperiment.getIterations()) {
+                while (contExperiment.getCurrentIteration() <= contExperiment.getIterations() + 1) {
                     try {
                         contExperiment.getRadioProcessor().start();
                         contExperiment.onScan.invoke(this, contExperiment.getRadioProcessor().getData());
@@ -335,7 +335,7 @@ public class MainController implements Initializable {
 
         // set onDone event - update desired parameter when single scan is finished
         contExperiment.getRadioProcessor().getPulse().onDone = createPulseParameterUpdateEvent(contExperiment);
-        contExperiment.getRadioProcessor().getPulse().onComplete = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Using " + contExperiment.getParameter().getName() + " value " + contExperiment.getParameterValue()));
+        contExperiment.getRadioProcessor().getPulse().onComplete = (sender, value) -> Platform.runLater(() -> leftStatus.setText("Using " + contExperiment.getParameter().getName() + " value " + contExperiment.getCurrentParameterValue()));
 
         // prepare cont experiment plots
         statsPlot.setDisable(false);
@@ -346,9 +346,9 @@ public class MainController implements Initializable {
             modPlot.setDisable(false);
 
             double ptsFreq = contExperiment.getParameter().getInitialValue();
-            double swMHZ = (double)hahnEchoParameters.getSpectralWidth() / 1000;
-            ((NumberAxis) spectrumChart.getXAxis()).setLowerBound(ptsFreq - swMHZ/2);
-            ((NumberAxis) spectrumChart.getXAxis()).setUpperBound(ptsFreq + contExperiment.getIterations()*contExperiment.getStep() + swMHZ/2);
+            double swMHZ = (double) hahnEchoParameters.getSpectralWidth() / 1000;
+            ((NumberAxis) spectrumChart.getXAxis()).setLowerBound(ptsFreq - swMHZ / 2);
+            ((NumberAxis) spectrumChart.getXAxis()).setUpperBound(ptsFreq + contExperiment.getIterations() * contExperiment.getStep() + swMHZ / 2);
             ((NumberAxis) spectrumChart.getXAxis()).setTickUnit(0.1);
 
             ptsChartViewModel = new PTSChartViewModel(contExperiment, hahnEchoParameters, spectrumChart);
@@ -370,7 +370,7 @@ public class MainController implements Initializable {
         return (sender, value) -> {
             System.out.println("Spectrum update running!");
 
-            ptsChartViewModel.addData(((ContExperiment) experiment).getParameterValue(), value);
+            ptsChartViewModel.addData(((ContExperiment) experiment).getNextParameterValue(), value);
 
             Invokable<Complex[]> statsChartUpdate = createStatsChartUpdateEvent(statsChart);
             statsChartUpdate.invoke(sender, value);
@@ -395,13 +395,13 @@ public class MainController implements Initializable {
                         HahnEcho hahnEcho = (HahnEcho) sender;
                         HahnEchoParameters hahnEchoParameters = hahnEcho.getParameters();
 
-                        float newValue = (float) contExperiment.getParameterValue();
+                        float newValue = (float) contExperiment.getNextParameterValue();
                         hahnEchoParameters.setAmplitude(newValue);
                     } else if (sender instanceof HahnEchoCYCLOPS) {
                         HahnEchoCYCLOPS hahnEchoCYCLOPS = (HahnEchoCYCLOPS) sender;
                         HahnEchoParameters hahnEchoParameters = hahnEchoCYCLOPS.getParameters();
 
-                        float newValue = (float) contExperiment.getParameterValue();
+                        float newValue = (float) contExperiment.getNextParameterValue();
                         hahnEchoParameters.setAmplitude(newValue);
                     } else {
                         // TODO other pulse series..
@@ -409,7 +409,7 @@ public class MainController implements Initializable {
                 };
             case ContParameter.PTS_FREQ:
                 return (sender, value) -> {
-                    double newValue = contExperiment.getParameterValue();
+                    double newValue = contExperiment.getNextParameterValue();
 
                     try {
                         PTS.setFrequency(newValue);
@@ -423,13 +423,13 @@ public class MainController implements Initializable {
                         HahnEcho hahnEcho = (HahnEcho) sender;
                         HahnEchoParameters hahnEchoParameters = hahnEcho.getParameters();
 
-                        double newValue = contExperiment.getParameterValue();
+                        double newValue = contExperiment.getNextParameterValue();
                         hahnEchoParameters.setRepetitionDelay(newValue);
                     } else if (sender instanceof HahnEchoCYCLOPS) {
                         HahnEchoCYCLOPS hahnEchoCYCLOPS = (HahnEchoCYCLOPS) sender;
                         HahnEchoParameters hahnEchoParameters = hahnEchoCYCLOPS.getParameters();
 
-                        double newValue = contExperiment.getParameterValue();
+                        double newValue = contExperiment.getNextParameterValue();
                         hahnEchoParameters.setRepetitionDelay(newValue);
                     } else {
                         // TODO other pulse series..
@@ -441,13 +441,13 @@ public class MainController implements Initializable {
                         HahnEcho hahnEcho = (HahnEcho) sender;
                         HahnEchoParameters hahnEchoParameters = hahnEcho.getParameters();
 
-                        double newValue = contExperiment.getParameterValue();
+                        double newValue = contExperiment.getNextParameterValue();
                         hahnEchoParameters.setTau(newValue);
                     } else if (sender instanceof HahnEchoCYCLOPS) {
                         HahnEchoCYCLOPS hahnEchoCYCLOPS = (HahnEchoCYCLOPS) sender;
                         HahnEchoParameters hahnEchoParameters = hahnEchoCYCLOPS.getParameters();
 
-                        double newValue = contExperiment.getParameterValue();
+                        double newValue = contExperiment.getNextParameterValue();
                         hahnEchoParameters.setTau(newValue);
                     } else {
                         // TODO other pulse series..
@@ -561,7 +561,7 @@ public class MainController implements Initializable {
         pulse.onRefresh = (sender, value) -> Platform.runLater(() -> {
             if (experiment instanceof ContExperiment) {
                 ContExperiment contExperiment = (ContExperiment) experiment;
-                leftStatus.setText("Current scan: " + value + ", " + contExperiment.getParameter().getName() + " value: " + (contExperiment.getParameterValue() - contExperiment.getStep()));
+                leftStatus.setText("Current scan: " + value + ", " + contExperiment.getParameter().getName() + " value: " + (contExperiment.getNextParameterValue() - contExperiment.getStep()));
             } else {
                 leftStatus.setText("Current scan: " + value);
             }
@@ -699,6 +699,8 @@ public class MainController implements Initializable {
     }
 
     private Invokable<Complex[]> createStatsChartUpdateEvent(LineChart<Number, Number> lineChart) {
+        Platform.runLater(() -> lineChart.getXAxis().setLabel(((ContExperiment) experiment).getParameter().getName()));
+
         return (sender, value) -> Platform.runLater(() -> {
             ContExperiment contExperiment = (ContExperiment) experiment;
             Complex[] data = contExperiment.getRadioProcessor().getPulse().getData();
@@ -723,6 +725,7 @@ public class MainController implements Initializable {
             final XYChart.Series<Number, Number> modulFFTIntSeries;
 
             String fftSeriesName = "FFT Mod at " + (deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency()) + "MHz";
+            double x = contExperiment.getParameter().getInitialValue() + contExperiment.getStep() * (contExperiment.getCurrentIteration() - 2);
             if (lineChart.getData().size() == 0) {
                 modulMaxSeries = new XYChart.Series<>();
                 modulFFTMaxSeries = new XYChart.Series<>();
@@ -734,17 +737,16 @@ public class MainController implements Initializable {
                 modulIntSeries.setName("Mod Integral");
                 modulFFTIntSeries.setName(fftSeriesName);
 
-                modulMaxSeries.getData().add(new XYChart.Data<>(1, modulMax));
-                modulFFTMaxSeries.getData().add(new XYChart.Data<>(1, modulFFTMax));
-                modulIntSeries.getData().add(new XYChart.Data<>(1, modulInt));
-                modulFFTIntSeries.getData().add(new XYChart.Data<>(1, fftValue));
+                modulMaxSeries.getData().add(new XYChart.Data<>(x, modulMax));
+                modulFFTMaxSeries.getData().add(new XYChart.Data<>(x, modulFFTMax));
+                modulIntSeries.getData().add(new XYChart.Data<>(x, modulInt));
+                modulFFTIntSeries.getData().add(new XYChart.Data<>(x, fftValue));
 
                 lineChart.getData().add(modulMaxSeries);
                 lineChart.getData().add(modulFFTMaxSeries);
                 lineChart.getData().add(modulIntSeries);
                 lineChart.getData().add(modulFFTIntSeries);
             } else {
-                int x = lineChart.getData().get(0).getData().size() + 1;
                 for (XYChart.Series<Number, Number> series : lineChart.getData()) {
                     String seriesName = series.getName();
                     if (seriesName.equals("Mod Max")) {

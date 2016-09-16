@@ -107,8 +107,12 @@ public class ContExperiment extends Experiment {
         return dataCollection;
     }
 
-    public double getParameterValue() {
+    public double getNextParameterValue() {
         return parameter.getInitialValue() + step * currentIteration;
+    }
+
+    public double getCurrentParameterValue() {
+        return parameter.getInitialValue() + (currentIteration - 1) * step;
     }
 
     /**

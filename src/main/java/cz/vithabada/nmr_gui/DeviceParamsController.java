@@ -74,6 +74,7 @@ public class DeviceParamsController implements Initializable {
             byte gain = Byte.parseByte(gainTextField.getText());
 
             rs232Attenuator.setGain(gain, bwCheckbox.isSelected(), db40Checkbox.isSelected());
+            rs232Attenuator.setGain(gain, bwCheckbox.isSelected(), db40Checkbox.isSelected());
 
             setStatusLabel(gainLabel, DeviceStatus.OK);
         } catch (NumberFormatException e) {
