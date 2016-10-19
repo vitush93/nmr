@@ -127,6 +127,8 @@ public class MainController implements Initializable {
 
     private Stage stage;
 
+    private final Object lock = new Object();
+
     /**
      * Holds HahnEcho form values.
      */
@@ -317,6 +319,24 @@ public class MainController implements Initializable {
                         contExperiment.onScan.invoke(this, contExperiment.getRadioProcessor().getData());
 
                         contExperiment.incrementCurrentStep(); // TODO check if valid parameter value
+
+                        Platform.runLater(() -> {
+                            synchronized (lock) {
+                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                alert.setTitle("Tuning");
+                                alert.setHeaderText(null);
+                                alert.setContentText("Please tune the thing.");
+
+                                alert.showAndWait();
+
+                                lock.notify();
+                            }
+                        });
+
+                        synchronized (lock) {
+                            lock.wait();
+                        }
+
                         Thread.sleep(500);
                     } catch (Exception e) {
                         e.printStackTrace();
