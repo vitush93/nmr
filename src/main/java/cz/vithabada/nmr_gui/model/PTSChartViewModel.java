@@ -42,7 +42,7 @@ public class PTSChartViewModel {
         Platform.runLater(() -> {
             chart.getData().add(spectrumSeries);
 
-            spectrumSeries.nodeProperty().get().setStyle("-fx-stroke-width: 4px;");
+            spectrumSeries.nodeProperty().get().setStyle("-fx-stroke-width: 1px;");
         });
     }
 

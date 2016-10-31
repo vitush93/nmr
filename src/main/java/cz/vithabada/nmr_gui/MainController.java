@@ -320,21 +320,24 @@ public class MainController implements Initializable {
 
                         contExperiment.incrementCurrentStep(); // TODO check if valid parameter value
 
-                        Platform.runLater(() -> {
+                        if (contExperiment.getParameter().getId() == ContParameter.PTS_FREQ
+                                && contExperiment.getCurrentIteration() <= contExperiment.getIterations() + 1) {
+                            Platform.runLater(() -> {
+                                synchronized (lock) {
+                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                    alert.setTitle("Tuning");
+                                    alert.setHeaderText(null);
+                                    alert.setContentText("Please tune the thing.");
+
+                                    alert.showAndWait();
+
+                                    lock.notify();
+                                }
+                            });
+
                             synchronized (lock) {
-                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                alert.setTitle("Tuning");
-                                alert.setHeaderText(null);
-                                alert.setContentText("Please tune the thing.");
-
-                                alert.showAndWait();
-
-                                lock.notify();
+                                lock.wait();
                             }
-                        });
-
-                        synchronized (lock) {
-                            lock.wait();
                         }
 
                         Thread.sleep(500);
