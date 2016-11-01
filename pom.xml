@@ -128,6 +128,11 @@
             <version>3.5</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
+        <dependency>
             <groupId>com.dooapp.fxform2</groupId>
             <artifactId>core</artifactId>
             <version>8.0.12</version> <!-- Note: For JavaFX 2.2, use 2.2.6 -->

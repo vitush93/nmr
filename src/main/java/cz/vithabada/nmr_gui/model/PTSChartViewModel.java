@@ -1,11 +1,13 @@
 package cz.vithabada.nmr_gui.model;
 
+import com.sun.deploy.util.ArrayUtil;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
 import cz.vithabada.nmr_gui.libs.FFT;
 import cz.vithabada.nmr_gui.pulse.ContExperiment;
 import javafx.application.Platform;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.complex.Complex;
 
 import java.math.BigDecimal;
@@ -42,12 +44,14 @@ public class PTSChartViewModel {
         Platform.runLater(() -> {
             chart.getData().add(spectrumSeries);
 
-            spectrumSeries.nodeProperty().get().setStyle("-fx-stroke-width: 6px;");
+            spectrumSeries.nodeProperty().get().setStyle("-fx-stroke-width: 4px;");
         });
     }
 
     public void addData(double ptsFreq, Complex[] data) {
-        Complex[] mod = FFT.modul(data);
+        Complex[] mod = FFT.modulFFT(data);
+        mod = FFT.fixFFTdata(mod);
+
         this.dataSet.put(ptsFreq, mod);
 
         final XYChart.Series<Number, Number> modul = new XYChart.Series<>();
@@ -65,10 +69,6 @@ public class PTSChartViewModel {
             initialIndex = (int) Math.floor(mod.length / 2);
         }
 
-        BigDecimal ptsFreqBig = new BigDecimal(ptsFreq);
-        ptsFreqBig = ptsFreqBig.multiply(new BigDecimal(1e6));
-
-//        int ptsFreqI = ptsFreqBig.intValue();
         int ptsFreqI = (int)(ptsFreq * 1e6);
 
         pointFrequencies[initialIndex] = ptsFreqI;

@@ -1,5 +1,6 @@
 package cz.vithabada.nmr_gui.libs;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -33,6 +34,8 @@ public class FFT {
         for (int i = 0; i < transformed.length; i++) {
             temp[(transformed.length / 2 + i) % transformed.length] = transformed[i % transformed.length];
         }
+
+        ArrayUtils.reverse(temp);
 
         return temp;
     }
