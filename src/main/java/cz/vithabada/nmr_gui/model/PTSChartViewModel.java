@@ -42,7 +42,7 @@ public class PTSChartViewModel {
         Platform.runLater(() -> {
             chart.getData().add(spectrumSeries);
 
-            spectrumSeries.nodeProperty().get().setStyle("-fx-stroke-width: 1px;");
+            spectrumSeries.nodeProperty().get().setStyle("-fx-stroke-width: 6px;");
         });
     }
 
@@ -55,8 +55,8 @@ public class PTSChartViewModel {
         df.setRoundingMode(RoundingMode.CEILING);
 
         modul.setName(df.format(ptsFreq) + " MHz");
-        double[] pointFrequencies = new double[mod.length];
-        double deltaF = (double) (this.hahnEchoParameters.getSpectralWidth() / this.hahnEchoParameters.getNumPoints()) / 1000;
+        int[] pointFrequencies = new int[mod.length];
+        int deltaF = (this.hahnEchoParameters.getSpectralWidth() / this.hahnEchoParameters.getNumPoints()) * 1000;
 
         int initialIndex;
         if (mod.length % 2 == 0) {
@@ -65,20 +65,26 @@ public class PTSChartViewModel {
             initialIndex = (int) Math.floor(mod.length / 2);
         }
 
-        pointFrequencies[initialIndex] = ptsFreq;
+        BigDecimal ptsFreqBig = new BigDecimal(ptsFreq);
+        ptsFreqBig = ptsFreqBig.multiply(new BigDecimal(1e6));
+
+//        int ptsFreqI = ptsFreqBig.intValue();
+        int ptsFreqI = (int)(ptsFreq * 1e6);
+
+        pointFrequencies[initialIndex] = ptsFreqI;
 
         int index = initialIndex - 1;
         for (int i = 1; i < mod.length; i++) {
             if (index < 0) break;
 
-            pointFrequencies[index--] = ptsFreq - (i * deltaF);
+            pointFrequencies[index--] = ptsFreqI - (i * deltaF);
         }
 
         index = initialIndex + 1;
         for (int i = 1; i < mod.length; i++) {
             if (index >= mod.length) break;
 
-            pointFrequencies[index++] = ptsFreq + (i * deltaF);
+            pointFrequencies[index++] = ptsFreqI + (i * deltaF);
         }
 
         for (int i = 0; i < mod.length; i++) {
@@ -90,32 +96,34 @@ public class PTSChartViewModel {
             ));
         }
 
-        spectrumMap.clear();
-        for (XYChart.Series<Number, Number> series : lineChart.getData()) {
-            if (series == spectrumSeries) continue;
+        Platform.runLater(() -> {
+            this.lineChart.getData().add(modul);
 
-            for (XYChart.Data<Number, Number> item : series.getData()) {
-                Number key = item.getXValue();
-                Number value = item.getYValue();
+            spectrumMap.clear();
+            for (XYChart.Series<Number, Number> series : lineChart.getData()) {
+                if (series == spectrumSeries) continue;
 
-                if (spectrumMap.containsKey(key)) {
-                    int compare = new BigDecimal(
-                            spectrumMap.get(key).toString())
-                            .compareTo(new BigDecimal(
-                                            value.toString()
-                                    )
-                            );
+                for (XYChart.Data<Number, Number> item : series.getData()) {
+                    Number key = item.getXValue();
+                    Number value = item.getYValue();
 
-                    if (compare < 0) {
+                    if (spectrumMap.containsKey(key)) {
+                        int compare = new BigDecimal(
+                                spectrumMap.get(key).toString())
+                                .compareTo(new BigDecimal(
+                                                value.toString()
+                                        )
+                                );
+
+                        if (compare < 0) {
+                            spectrumMap.put(key, value);
+                        }
+                    } else {
                         spectrumMap.put(key, value);
                     }
-                } else {
-                    spectrumMap.put(key, value);
                 }
             }
-        }
 
-        Platform.runLater(() -> {
             spectrumSeries.getData().clear();
 
             for (Number key : spectrumMap.keySet()) {
@@ -125,7 +133,7 @@ public class PTSChartViewModel {
                 ));
             }
 
-            this.lineChart.getData().add(modul);
+            spectrumSeries.getNode().toFront();
         });
     }
 

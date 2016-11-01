@@ -370,9 +370,9 @@ public class MainController implements Initializable {
 
             double ptsFreq = contExperiment.getParameter().getInitialValue();
             double swMHZ = (double) hahnEchoParameters.getSpectralWidth() / 1000;
-            ((NumberAxis) spectrumChart.getXAxis()).setLowerBound(ptsFreq - swMHZ / 2);
-            ((NumberAxis) spectrumChart.getXAxis()).setUpperBound(ptsFreq + contExperiment.getIterations() * contExperiment.getStep() + swMHZ / 2);
-            ((NumberAxis) spectrumChart.getXAxis()).setTickUnit(0.1);
+            ((NumberAxis) spectrumChart.getXAxis()).setLowerBound((ptsFreq - swMHZ / 2) * 1e6);
+            ((NumberAxis) spectrumChart.getXAxis()).setUpperBound((ptsFreq + contExperiment.getIterations() * contExperiment.getStep() + swMHZ / 2) * 1e6);
+            ((NumberAxis) spectrumChart.getXAxis()).setTickUnit(100000);
 
             ptsChartViewModel = new PTSChartViewModel(contExperiment, hahnEchoParameters, spectrumChart);
 
