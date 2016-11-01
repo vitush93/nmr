@@ -158,6 +158,10 @@ public class MainController implements Initializable {
         initPulseEvents(experiment.getRadioProcessor().getPulse());
         initPulseTaskEvents(experiment.getTask());
 
+        deviceParamsController.setAttenuation(null);
+        deviceParamsController.setGain();
+        deviceParamsController.setPts();
+
         Thread t = new Thread(experiment.getTask());
         t.setDaemon(true);
         t.start();
@@ -321,7 +325,8 @@ public class MainController implements Initializable {
                         contExperiment.incrementCurrentStep(); // TODO check if valid parameter value
 
                         if (contExperiment.getParameter().getId() == ContParameter.PTS_FREQ
-                                && contExperiment.getCurrentIteration() <= contExperiment.getIterations() + 1) {
+                                && contExperiment.getCurrentIteration() <= contExperiment.getIterations() + 1
+                                && SpinAPI.INSTANCE.pb_read_status() == 0x03) {
                             Platform.runLater(() -> {
                                 synchronized (lock) {
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -380,6 +385,10 @@ public class MainController implements Initializable {
         } else {
             contExperiment.onScan = createStatsChartUpdateEvent(statsChart);
         }
+
+        deviceParamsController.setAttenuation(null);
+        deviceParamsController.setGain();
+        deviceParamsController.setPts();
 
         Thread t = new Thread(contExperiment.getTask());
 
