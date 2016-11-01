@@ -21,8 +21,8 @@
       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
     </rowConstraints>
     <children>
-      <Label text="PTS Freq (MHz)" GridPane.rowIndex="1" />
-      <TextField fx:id="ptsTextField" text="47.46" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <Label text="Freq (MHz)" GridPane.rowIndex="1" />
+      <TextField fx:id="ptsTextField" text="45.46" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <GridPane.margin>
             <Insets left="20.0" right="20.0" />
          </GridPane.margin>

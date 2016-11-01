@@ -687,8 +687,8 @@ public class MainController implements Initializable {
             for (int i = 0, valueLength = value.length; i < valueLength; i++) {
                 Complex c = value[i];
 
-                real.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth() / 2000, c.getReal() / finalNum_scans1));
-                imag.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth() / 2000, c.getImaginary() / finalNum_scans1));
+                real.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectralWidth() / 2000, c.getReal() / finalNum_scans1));
+                imag.getData().add(new XYChart.Data<>((experiment.getSpectralWidth() / (valueLength * 1000)) * i + deviceParamsController.getPTSFreq() - experiment.getSpectralWidth() / 2000, c.getImaginary() / finalNum_scans1));
             }
 
             lineChart.getData().add(real);
@@ -803,8 +803,8 @@ public class MainController implements Initializable {
             Invokable<Complex[]> dataChartUpdate = createDataChartUpdateEvent(dataChart);
             dataChartUpdate.invoke(sender, value);
 
-            double left = deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() - experiment.getSpectralWidth() / 2000;
-            double right = deviceParamsController.getPTSFreq() - experiment.getSpectrometerFrequency() + experiment.getSpectralWidth() / 2000;
+            double left = deviceParamsController.getPTSFreq() - (experiment.getSpectralWidth() / 2000);
+            double right = deviceParamsController.getPTSFreq() + (experiment.getSpectralWidth() / 2000);
 
             fftChart.getXAxis().setAutoRanging(false);
             ((NumberAxis) fftChart.getXAxis()).setLowerBound(left);

@@ -22,7 +22,7 @@ public class PTS {
         int allowPhase = 0;
         int noPTS = 1;
 
-        if (SpinAPI.INSTANCE.set_pts(maxFreq, is160, is3200, allowPhase, noPTS, freq, 0) != 0) {
+        if (SpinAPI.INSTANCE.set_pts(maxFreq, is160, is3200, allowPhase, noPTS, freq + 2, 0) != 0) {
             throw new PTSException();
         }
     }
