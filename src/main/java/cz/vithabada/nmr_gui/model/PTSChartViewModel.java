@@ -55,7 +55,7 @@ public class PTSChartViewModel {
         this.dataSet.put(ptsFreq, mod);
 
         final XYChart.Series<Number, Number> modul = new XYChart.Series<>();
-        DecimalFormat df = new DecimalFormat("#.####");
+        DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.CEILING);
 
         modul.setName(df.format(ptsFreq) + " MHz");
