@@ -4,7 +4,7 @@ import com.dooapp.fxform.FXForm;
 import cz.vithabada.nmr_gui.api.FTDI_Device;
 import cz.vithabada.nmr_gui.forms.FormFactory;
 import cz.vithabada.nmr_gui.forms.HahnEchoParameters;
-import cz.vithabada.nmr_gui.libs.PTS;
+import cz.vithabada.nmr_gui.libs.*;
 import cz.vithabada.nmr_gui.model.PTSChartViewModel;
 import cz.vithabada.nmr_gui.pulse.*;
 import javafx.animation.Animation;
@@ -29,9 +29,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import cz.vithabada.nmr_gui.libs.AlertHelper;
-import cz.vithabada.nmr_gui.libs.FFT;
-import cz.vithabada.nmr_gui.libs.Invokable;
 import cz.vithabada.nmr_gui.model.Experiment;
 import cz.vithabada.nmr_gui.model.PlainTextData;
 import org.apache.commons.math3.complex.Complex;
@@ -233,12 +230,24 @@ public class MainController implements Initializable {
         iterations.setPromptText("Iterations");
         iterations.setText("1");
 
-        grid.add(new Label("Parameter:"), 0, 0);
-        grid.add(parameters, 1, 0);
-        grid.add(new Label("Step:"), 0, 1);
-        grid.add(step, 1, 1);
-        grid.add(new Label("Iterations:"), 0, 2);
-        grid.add(iterations, 1, 2);
+
+        try {
+            int num_points = NumPointsResolver.getNumPoints(hahnEchoParameters.getSpectralWidth(), hahnEchoParameters.getNumberOfScans(), hahnEchoParameters.getAdcFrequency(), hahnEchoParameters.getEchoTime());
+            double recStep = ((double)hahnEchoParameters.getSpectralWidth() / 100) / num_points;
+
+            grid.add(new Label("PTS Freq. step multiplier:"), 0, 0);
+            grid.add(new Label(recStep + ""), 1, 0);
+        } catch (Exception e) {
+            grid.add(new Label("ERROR: " + e.getMessage()), 0, 0);
+
+            e.printStackTrace();
+        }
+        grid.add(new Label("Parameter:"), 0, 1);
+        grid.add(parameters, 1, 1);
+        grid.add(new Label("Step:"), 0, 2);
+        grid.add(step, 1, 2);
+        grid.add(new Label("Iterations:"), 0, 3);
+        grid.add(iterations, 1, 3);
 
         Node startButton = dialog.getDialogPane().lookupButton(loginButtonType);
 
